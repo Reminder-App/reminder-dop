@@ -1,16 +1,17 @@
 SPL Reminder {
 
-	Features = {Reminder, GUI, ManageReminder, Create, Edit, View}
+	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
 		dEditGUI, dEditController, dEditModel,
-		dViewGUI, dViewController, dViewModel
+		dViewGUI, dViewController, dViewModel,
+		dDeleteController, dDeleteModel
 	}
 
 	Constraints {
 		Reminder & GUI & ManageReminder;
-		ManageReminder & (Create & Edit & View);
+		ManageReminder & (Create & Edit & View & Delete);
 	}
 
 	Partitions {
@@ -19,9 +20,10 @@ SPL Reminder {
 		{dCreateGUI, dCreateController, dCreateModel} when (Create);
 		{dEditGUI, dEditController, dEditModel} when (Edit);
 		{dViewGUI, dViewController, dViewModel} when (View);
+		{dDeleteController, dDeleteModel} when (Delete);
 	}
 
 	Products {
-		Base = {Reminder, GUI, ManageReminder, Create, Edit, View};
+		Base = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete};
 	}
 }
