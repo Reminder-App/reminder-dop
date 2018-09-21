@@ -1,0 +1,56 @@
+delta dViewController {
+	modifies br.unb.cic.reminders.controller.Controller {
+		adds public List<Reminder> listReminders() throws Exception {
+			try {
+				return DBFactory.factory(context).createReminderDAO().listReminders();
+			}
+			catch(DBException e) {
+				throw e;
+			}
+		}
+	}
+
+	modifies br.unb.cic.reminders.controller.ReminderFilter {
+		adds private List<Reminder> reminders;
+
+		adds public List<Reminder> getReminderList() {
+			updateReminders();
+			return reminders;
+		}
+
+		adds public int getNumReminders() {
+			updateReminders();
+			return reminders.size();
+		}
+
+		adds private void updateReminders() {
+			reminders = new ArrayList<Reminder>();
+			List<Reminder> allReminders = null;
+
+			try {
+				allReminders = Controller.instance(context).listReminders();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			for(Reminder r : allReminders) {
+				if(selectReminder(r)) {
+					reminders.add(r);
+				}
+			}
+		}
+
+		adds abstract protected boolean selectReminder(Reminder r);
+	}
+
+	modifies br.unb.cic.reminders.controller.AllRemindersFilter {
+		adds public AllRemindersFilter(Context context) {
+			super(context);
+		}
+
+		adds @Override
+		protected boolean selectReminder(Reminder r) {
+			return true;
+		}
+	}
+}
