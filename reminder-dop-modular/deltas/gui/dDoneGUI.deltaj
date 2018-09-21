@@ -1,0 +1,26 @@
+delta dDoneGUI {
+
+	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
+		modifies view(int position, LinearLayout reminderRow){
+			original(position, reminderRow);
+			
+			CheckBox tvDone = (CheckBox) reminderRow.findViewById(R.id.cbDone);
+			tvDone.setTag(position);
+			tvDone.setOnCheckedChangeListener(new
+				CompoundButton.OnCheckedChangeListener() {
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+					{
+						try {
+							Reminder reminder = getItem(( Integer ) buttonView.getTag());
+							reminder.setDone(isChecked);
+							Controller.instance(getContext()).updateReminder(reminder);
+						}
+						catch(DBException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			tvDone.setChecked(getItem(position).isDone());
+		}
+	}
+}

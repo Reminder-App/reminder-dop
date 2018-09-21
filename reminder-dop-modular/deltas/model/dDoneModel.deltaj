@@ -1,0 +1,39 @@
+delta dDoneModel {
+	modifies br.unb.cic.reminders.model.Reminder {
+		adds @Column(column = "DONE", type = DBTypes.INT)
+		private boolean done;
+
+		adds public boolean isDone() {
+			return done;
+		}
+
+		adds public void setDone(boolean done) {
+			this.done = done;
+		}
+
+		adds public int getDone() {
+			return done ? 1 : 0;
+		}
+
+		adds public void setDone(int done) {
+			this.done =(done == 0 ? false : true);
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.db.DBConstants {
+		adds public static String REMINDER_DONE_COLUMN = "DONE";
+		
+		modifies tableStatement() {
+			return original() + "DONE INTEGER NOT NULL,";
+		}
+	}
+	
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		modifies valuesCursorToReminder(Cursor cursor, Reminder reminder) {
+			original(cursor, reminder);
+			
+			int done = cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_DONE_COLUMN));
+			reminder.setDone(done);
+		}
+	}
+}
