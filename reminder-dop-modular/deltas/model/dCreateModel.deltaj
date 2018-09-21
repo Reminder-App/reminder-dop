@@ -1,0 +1,16 @@
+delta dCreateModel {
+	modifies br.unb.cic.reminders.model.db.ReminderDAO {
+		adds public Long saveReminder(Reminder r) throws DBException;
+	}
+
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		adds public Long saveReminder(Reminder r) throws DBException {
+			try {
+				return persist(r);
+			}
+			catch(DBInvalidEntityException e) {
+				throw new DBException();
+			}
+		}
+	}
+}
