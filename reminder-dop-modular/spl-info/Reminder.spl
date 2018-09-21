@@ -1,17 +1,20 @@
 SPL Reminder {
 
-	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done}
+	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, FixedDate}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
 		dEditGUI, dEditController, dEditModel,
 		dViewGUI, dViewController, dViewModel,
 		dDeleteController, dDeleteModel,
-		dDoneGUI, dDoneModel
+		dDoneGUI, dDoneModel,
+		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
+		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
+		dCreateFixedDateGUI, dViewFixedDateGUI
 	}
 
 	Constraints {
-		Reminder & GUI & ManageReminder;
+		Reminder & GUI & ManageReminder & FixedDate;
 		ManageReminder & (Create & Edit & View & Delete & Done);
 	}
 
@@ -23,9 +26,12 @@ SPL Reminder {
 		{dViewGUI, dViewController, dViewModel} when (View);
 		{dDeleteController, dDeleteModel} when (Delete);
 		{dDoneGUI, dDoneModel} when (Done);
+		{dFixedDateGUI, dFixedDateModel, dFixedDateUtil} when (FixedDate);
+		{dViewFixedDateGUI} when (GUI & View & FixedDate);
+		{dCreateFixedDateGUI} when (GUI & Create & FixedDate);
 	}
 
 	Products {
-		Base = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done};
+		Base = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, FixedDate};
 	}
 }
