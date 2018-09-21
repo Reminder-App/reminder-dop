@@ -1,0 +1,404 @@
+delta dModel {
+	adds {
+		package br.unb.cic.reminders.model;
+
+		import java.util.regex.Matcher;
+		import java.util.regex.Pattern;
+
+		import util.Patterns;
+		import br.unb.cic.framework.persistence.DBTypes;
+		import br.unb.cic.framework.persistence.annotations.Column;
+		import br.unb.cic.framework.persistence.annotations.Entity;
+
+		@Entity(table = "REMINDER")
+		public class Reminder {
+
+			@Column(column = "PK", primaryKey = true, type = DBTypes.LONG)
+			private Long id;
+
+			@Column(column = "TEXT", type = DBTypes.TEXT)
+			private String text;
+
+			@Column(column = "DETAILS", type = DBTypes.TEXT)
+			private String details;
+
+			public Reminder() {
+			}
+
+			public Reminder(Long id, String text) {
+				this.id = id;
+				this.text = text;
+			}
+
+			public Long getId() {
+				return id;
+			}
+
+			public void setId(Long id) {
+				this.id = id;
+			}
+
+			public String getText() {
+				return text;
+			}
+
+			public void setText(String text) {
+				if(text == null || text.trim().equals("")) {
+					throw new InvalidTextException(text);
+				}
+				this.text = text;
+			}
+
+			public String getDetails() {
+				return details;
+			}
+
+			public void setDetails(String details) {
+				if(details == null || details.trim().equals("")) {
+					this.details = null;
+				}
+				else {
+					this.details = details;
+				}
+			}
+
+			public boolean isValid() {
+				return(text != null);
+			}
+
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.db;
+
+		public class DBConstants {
+			public static String DROP_TABLE_STATEMENTS [] = {
+				"DROP TABLE IF EXISTS REMINDER"
+			};
+
+			public static String CREATE_TABLE_STATEMENTS [] = {
+				"CREATE TABLE REMINDER ( "  + tableStatement() + "TEXT VARCHAR(50) NOT NULL," +
+				"DETAILS VARCHAR(50) NULL);",
+			};
+
+			private static String tableStatement() {
+				return "PK INTEGER PRIMARY KEY AUTOINCREMENT, ";
+			}
+
+			public static final String SELECT_REMINDERS = "SELECT * FROM REMINDER";
+
+			public static String REMINDER_TABLE = "REMINDER";
+			public static String REMINDER_PK_COLUMN = "PK";
+			public static String REMINDER_TEXT_COLUMN = "TEXT";
+			public static String REMINDER_DETAILS_COLUMN = "DETAILS";
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.db;
+
+		import android.content.Context;
+
+		public abstract class DBFactory {
+			protected Context context;
+
+			public static DBFactory factory(Context context) {
+				return new DefaultDBFactory(context);
+			}
+
+			public DBFactory(Context context) {
+				this.context = context;
+			}
+
+			public abstract ReminderDAO createReminderDAO();
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.db;
+
+		import android.content.Context;
+
+		public class DefaultDBFactory extends DBFactory {
+
+			public DefaultDBFactory(Context context) {
+				super(context);
+			}
+
+			@Override
+			public ReminderDAO createReminderDAO() {
+				return new DefaultReminderDAO(context);
+			}
+		}
+
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.cp;
+
+		import android.content.ContentProvider;
+		import android.content.ContentValues;
+		import android.content.UriMatcher;
+		import android.database.Cursor;
+		import android.net.Uri;
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.reminders.model.Reminder;
+		import br.unb.cic.reminders.model.db.DBConstants;
+		import br.unb.cic.reminders.model.db.DefaultDBFactory;
+		import br.unb.cic.reminders.model.db.ReminderDAO;
+
+		public class ReminderContentProvider extends ContentProvider {
+
+			private static final int REMINDERS = 10;
+
+			private static final String SECURITY_EXCEPTION =
+			"You are not allowed to call this method";
+
+			private static final String AUTHORITY =
+			"br.com.positivo.reminders.contentprovider";
+			private static final String BASE_PATH = "reminders";
+
+			public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY +
+				"/" + BASE_PATH);
+
+			public static final String text() {
+				return DBConstants.REMINDER_TEXT_COLUMN;
+			}
+
+			private ReminderDAO rdao;
+
+			private static final UriMatcher sURIMatcher = new
+			UriMatcher(UriMatcher.NO_MATCH);
+
+			static {
+				sURIMatcher.addURI(AUTHORITY, BASE_PATH, REMINDERS);
+			}
+
+			@Override
+			public boolean onCreate() {
+				rdao = DefaultDBFactory.factory(getContext()).createReminderDAO();
+				return false;
+			}
+
+			@Override
+			public Uri insert(Uri uri, ContentValues values) {
+				try {
+					Reminder reminder = new Reminder();
+
+					valuesInsert(values, reminder);
+
+					Long id = rdao.saveReminder(reminder);
+					getContext().getContentResolver().notifyChange(uri, null);
+					return Uri.parse(BASE_PATH + "/" + id);
+				}
+				catch(DBException e) {
+					throw new RuntimeException(e.getLocalizedMessage());
+				}
+			}
+
+			private void valuesInsert(ContentValues values, Reminder reminder) {
+				reminder.setText(values.getAsString(text()));
+			}
+
+			@Override
+			public Cursor query(Uri arg0, String [] arg1, String arg2, String [] arg3,
+				String arg4) {
+				return null;
+			}
+
+			@Override
+			public int delete(Uri arg0, String arg1, String [] arg2) {
+				throw new SecurityException(SECURITY_EXCEPTION);
+			}
+
+			@Override
+			public String getType(Uri arg0) {
+				return null;
+			}
+
+			@Override
+			public int update(Uri arg0, ContentValues arg1, String arg2, String [] arg3)
+			{
+				throw new SecurityException(SECURITY_EXCEPTION);
+			}
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model;
+
+		public class InvalidTextException extends InvalidFormatException {
+
+			private static final long serialVersionUID = 7998188562654167391L;
+
+			public InvalidTextException(Object o) {
+				super("This text " + o);
+			}
+
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model;
+
+		public class InvalidFormatException extends RuntimeException {
+
+			private static final long serialVersionUID = 2850584940310533216L;
+
+			public InvalidFormatException(Object o) {
+				super(o + " is in the wrong format");
+			}
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model;
+
+		public class InvalidDateException extends InvalidFormatException {
+
+			private static final long serialVersionUID = 7194191177254259925L;
+
+			public InvalidDateException(Object o) {
+				super("This date " + o);
+			}
+
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.db;
+
+		import android.content.Context;
+		import android.database.sqlite.SQLiteDatabase;
+		import android.database.sqlite.SQLiteDatabase.CursorFactory;
+		import android.database.sqlite.SQLiteException;
+		import android.database.sqlite.SQLiteOpenHelper;
+		import android.util.Log;
+
+		public class DBHelper extends SQLiteOpenHelper {
+
+			public DBHelper(Context context, String name, CursorFactory factory, int
+				version) {
+				super(context, name, factory, version);
+			}
+
+			@Override
+			public void onOpen(SQLiteDatabase db) {
+				db.execSQL("PRAGMA foreign_keys=ON;");
+				super.onOpen(db);
+			}
+
+			@Override
+			public void onCreate(SQLiteDatabase db) {
+				try {
+					for(String sql : DBConstants.CREATE_TABLE_STATEMENTS) {
+						Log.i(DBHelper.class.getCanonicalName(), sql);
+						db.execSQL(sql);
+					}
+				}
+				catch(SQLiteException e) {
+					Log.v(DBHelper.class.getName(), e.getMessage());
+				}
+			}
+
+			@Override
+			public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+				try {
+					for(String sql : DBConstants.DROP_TABLE_STATEMENTS) {
+						db.execSQL(sql);
+					}
+					onCreate(db);
+				}
+				catch(SQLiteException e) {
+					Log.v(DBHelper.class.getName(), e.getMessage());
+				}
+			}
+
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.db;
+
+		import java.util.List;
+
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.reminders.model.Reminder;
+
+		public interface ReminderDAO {
+
+			public void persistReminder(Reminder reminder) throws DBException;
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.model.db;
+
+		import java.util.ArrayList;
+		import java.util.List;
+
+		import android.content.Context;
+		import android.database.Cursor;
+		import android.database.sqlite.SQLiteException;
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.framework.persistence.DBInvalidEntityException;
+		import br.unb.cic.framework.persistence.GenericDAO;
+		import br.unb.cic.reminders.model.Reminder;
+
+		public class DefaultReminderDAO extends GenericDAO<Reminder> implements ReminderDAO {
+
+			public DefaultReminderDAO(Context c) {
+				super(c);
+			}
+
+			public void persistReminder(Reminder reminder) throws DBException {
+				try {
+					persist(reminder);
+				}
+				catch(DBInvalidEntityException e) {
+					throw new DBException();
+				}
+				finally {
+					db.close();
+					dbHelper.close();
+				}
+			}
+
+			private Reminder cursorToReminder(Cursor cursor) throws DBException {
+
+				Reminder reminder = new Reminder();
+
+				valuesCursorToReminder(cursor, reminder);
+
+				return reminder;
+			}
+			
+			private void valuesCursorToReminder(Cursor cursor, Reminder reminder) {
+				Long pk = cursor.getLong(cursor.getColumnIndex(DBConstants.REMINDER_PK_COLUMN));
+				reminder.setId(pk);
+				
+				String text = cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_TEXT_COLUMN));
+				reminder.setText(text);
+				
+				String details = cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_DETAILS_COLUMN));
+				reminder.setDetails(details);
+			}
+
+			private List<Reminder> remindersFromCursor(Cursor cursor) throws DBException
+			{
+				List<Reminder> reminders = new ArrayList<Reminder>();
+
+				if(cursor.moveToFirst()) {
+					do {
+						Reminder reminder = cursorToReminder(cursor);
+						reminders.add(reminder);
+					}
+					while(cursor.moveToNext());
+				}
+				cursor.close();
+				return reminders;
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+SPL Reminder {
+
+	Features = {Reminder}
+
+	Deltas = {dPersistence, dModel, dController, dReminder, dUtil}
+
+	Constraints {
+		Reminder;
+	}
+
+	Partitions {
+		{dPersistence, dModel, dController, dReminder, dUtil} when (Reminder);
+	}
+
+	Products {
+		Base = {Reminder};
+	}
+}
