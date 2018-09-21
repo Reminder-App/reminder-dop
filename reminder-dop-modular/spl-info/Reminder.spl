@@ -1,18 +1,19 @@
 SPL Reminder {
 
-	Features = {Reminder}
+	Features = {Reminder, GUI}
 
-	Deltas = {dPersistence, dModel, dController, dReminder, dUtil}
+	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI}
 
 	Constraints {
-		Reminder;
+		Reminder & GUI;
 	}
 
 	Partitions {
 		{dPersistence, dModel, dController, dReminder, dUtil} when (Reminder);
+		{dGUI} when (GUI);
 	}
 
 	Products {
-		Base = {Reminder};
+		Base = {Reminder, GUI};
 	}
 }
