@@ -70,7 +70,7 @@ delta dController {
 
 		public class AllRemindersFilter extends ReminderFilter {
 
-			private final String name = "Todos";
+			private final String name = "All";
 
 			@Override
 			public String getName() {

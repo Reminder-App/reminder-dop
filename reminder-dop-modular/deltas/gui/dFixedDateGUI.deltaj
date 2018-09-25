@@ -339,13 +339,8 @@ delta dFixedDateGUI {
 				return "";
 			}
 
-			String months [] = {
-				"JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT",
-				"NOV", "DEZ"
-			};
-			String week [] = {
-				"", "DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"
-			};
+			String months[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+			String week[] = { "", "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
 			Calendar today = Calendar.getInstance();
 			GregorianCalendar thatDay = new GregorianCalendar();
@@ -357,8 +352,8 @@ delta dFixedDateGUI {
 				case LATE : long diff = today.getTimeInMillis() -
 				thatDay.getTimeInMillis();
 				long days = diff /(24*60*60*1000);
-				if(days == 1) return "Ontem";
-				else return "Há " + days + " dias";
+				if(days == 1) return "Yesterday";
+				else return days + " days ago";
 
 				case TODAY : return getDatesHour(position);
 
@@ -387,7 +382,7 @@ delta dFixedDateGUI {
 		adds private String getDateSecond(int position) {
 			switch(rowType) {
 				case LATE : return getDatesHour(position);
-				case TODAY : return "hoje";
+				case TODAY : return "today";
 				case NEXT_DAYS : Calendar today = Calendar.getInstance();
 				GregorianCalendar thatDay = new GregorianCalendar();
 				thatDay.set(Integer.parseInt(getItem(position).getDate().substring(6, 10)),
@@ -397,7 +392,7 @@ delta dFixedDateGUI {
 				long diff = thatDay.getTimeInMillis() - today.getTimeInMillis();
 				long days = diff /(24*60*60*1000);
 
-				if(days == 1) return "amanha";
+				if(days == 1) return "tomorrow";
 				else return getDatesHour(position);
 				default : break;
 			}
