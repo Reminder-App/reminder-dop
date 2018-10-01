@@ -228,13 +228,14 @@ delta dCreateGUI {
 
 			@Override
 			protected void persist(Reminder reminder) {
+				persistValues(reminder);
+			}
+
+			private void persistValues(Reminder reminder) {
 				try {
 					Controller.instance(getApplicationContext()).addReminder(reminder);
 				}
 				catch(DBException e) {
-					e.printStackTrace();
-				}
-				catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -256,6 +257,15 @@ delta dCreateGUI {
 
 			@Override
 			protected void persist(Reminder reminder) {
+				try {
+					persistValues(reminder);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			private void persistValues(Reminder reminder) {
 				try {
 					Controller.instance(getApplicationContext()).addReminder(reminder);
 				}

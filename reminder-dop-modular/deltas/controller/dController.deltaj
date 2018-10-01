@@ -24,10 +24,6 @@ delta dController {
 				}
 
 				return instance;
-			}			
-
-			private void notImplementedYet() {
-				throw new RuntimeException("not implemented yet");
 			}
 			
 			public void persistReminder(Reminder reminder) throws DBException {
