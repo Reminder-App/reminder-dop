@@ -12,7 +12,7 @@
 	<groupId>br.unb.cic</groupId>
 	<artifactId>reminder-dop-modular</artifactId>
 	<version>0.0.1</version>
-	<name>Reminder - Application</name>
+	<name>Reminder DOP Modular - Application</name>
 
 	<properties>
 		<sonar.language>java</sonar.language>
