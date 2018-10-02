@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and mandatory="true" name="Reminder">
+				<and mandatory="true" name="Manage Reminder">
+					<feature mandatory="true" name="Create"/>
+					<feature mandatory="true" name="Edit"/>
+					<feature mandatory="true" name="Delete"/>
+					<feature mandatory="true" name="View"/>
+					<feature mandatory="true" name="Done"/>
+				</and>
+				<feature mandatory="true" name="GUI"/>
+        <feature mandatory="true" name="Fixed Date"/>
+				<alt name="Reminder Category">
+					<feature name="Manage Category"/>
+					<feature name="Static Category"/>
+				</alt>
+			</and>
+		</struct>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
