@@ -10,7 +10,6 @@ SPL Reminder {
 		dDeleteController, dDeleteModel,
 		dDoneGUI, dDoneModel,
 		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
-		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
 		dCreateFixedDateGUI, dViewFixedDateGUI,
 		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder,
 		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel
