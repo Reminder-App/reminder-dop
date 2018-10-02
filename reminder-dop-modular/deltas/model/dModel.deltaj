@@ -184,9 +184,7 @@ delta dModel {
 			@Override
 			public Uri insert(Uri uri, ContentValues values) {
 				try {
-					Reminder reminder = new Reminder();
-
-					valuesInsert(values, reminder);
+					Reminder reminder = createReminderInsert(values);				
 
 					Long id = rdao.saveReminder(reminder);
 					getContext().getContentResolver().notifyChange(uri, null);
@@ -197,8 +195,10 @@ delta dModel {
 				}
 			}
 
-			private void valuesInsert(ContentValues values, Reminder reminder) {
+			private Reminder createReminderInsert(ContentValues values) throws DBException {
+				Reminder reminder = new Reminder();
 				reminder.setText(values.getAsString(text()));
+				return reminder;
 			}
 
 			@Override

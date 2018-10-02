@@ -265,17 +265,16 @@ delta dStaticCategoryModel {
 			return false;
 		}
 
-		modifies valuesInsert(ContentValues values, Reminder reminder) throws
-		DBException {
-			original(values, reminder);
-			Category category;
-			try {
-				category = cdao.findCategory(values.getAsString(category()));
-				reminder.setCategory(category);
-			}
-			catch(Exception e) {
-				e.printStackTrace();
-			}
+		adds private Category createCategoryInsert(ContentValues values) throws DBException {
+			Category category = cdao.findCategory(values.getAsString(category()));
+			return category;
+		}
+		
+		modifies createReminderInsert(ContentValues values) {
+			Reminder reminder = original(values);
+			Category category = createCategoryInsert(values);
+			reminder.setCategory(category);
+			return reminder;
 		}
 	}
 

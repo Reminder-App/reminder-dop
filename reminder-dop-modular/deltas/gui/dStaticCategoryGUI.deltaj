@@ -214,7 +214,6 @@ delta dStaticCategoryGUI {
 		}
 
 		modifies persistValues(Reminder reminder) {
-			original(reminder);
 			Category category;
 			try {
 				category = findCategory(reminder.getCategory());
@@ -223,6 +222,7 @@ delta dStaticCategoryGUI {
 			catch(Exception e) {
 				e.printStackTrace();
 			}
+			original(reminder);
 		}
 		
 		adds private Category findCategory(Category category) throws Exception {
@@ -253,7 +253,6 @@ delta dStaticCategoryGUI {
 		adds import java.util.List;
 
 		modifies persistValues(Reminder reminder) {
-			original(reminder);
 			Category category;
 			try {
 				category = findCategory(reminder.getCategory());
@@ -262,6 +261,7 @@ delta dStaticCategoryGUI {
 			catch(Exception e) {
 				e.printStackTrace();
 			}
+			original(reminder);
 		}
 
 		adds private Category findCategory(Category category) throws Exception {
@@ -278,26 +278,22 @@ delta dStaticCategoryGUI {
 		adds import br.unb.cic.reminders.model.Category;
 		adds import java.util.List;
 		adds private Category newCategory = null;
+		
+		adds private void setNewCategory(Intent intent) throws Exception {
+			String categoryName = intent.getStringExtra("category_name");
+			List<Category> categories = Controller.instance(getApplicationContext()).listCategories();
+			for (Category c : categories) {
+				if (c.getName().equals(categoryName)) {
+					newCategory = c;
+					break;
+				}
+			}
+		}
 
 		modifies reminderFromIntent(Intent intent) throws Exception {
 			original(intent);
-
-			String categoryName = intent.getStringExtra("category_name");
-
-			List<Category> categories;
-			try {
-				categories = Controller.instance(getApplicationContext()).listCategories();
-				for(Category c : categories) {
-					if(c.getName().equals(categoryName)) {
-						newCategory = c;
-						break;
-					}
-				}
-				reminder.setCategory(newCategory);
-			}
-			catch(Exception e) {
-				e.printStackTrace();
-			}
+			setNewCategory(intent);
+			reminder.setCategory(newCategory);
 		}
 
 		modifies initialize() {

@@ -1,7 +1,7 @@
 SPL Reminder {
 
 	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
-	FixedDate, StaticCategory}
+	FixedDate, ReminderCategory, StaticCategory, ManageCategory}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
@@ -12,12 +12,14 @@ SPL Reminder {
 		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
 		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
 		dCreateFixedDateGUI, dViewFixedDateGUI,
-		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder
+		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder,
+		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel
 	}
 
 	Constraints {
-		Reminder & GUI & ManageReminder & FixedDate | StaticCategory;
+		Reminder & GUI & ManageReminder & FixedDate | ReminderCategory;
 		ManageReminder & (Create & Edit & View & Delete & Done);
+		ReminderCategory & (StaticCategory ^ ManageCategory);
 	}
 
 	Partitions {
@@ -44,12 +46,18 @@ SPL Reminder {
 		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
 		dStaticCategoryPersistence, dStaticCategoryReminder} when (StaticCategory);
 
+		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
+		dStaticCategoryPersistence, dStaticCategoryReminder, dManageCategoryGUI,
+		dManageCategoryController, dManageCategoryModel} when (ManageCategory);
+
 	}
 
 	Products {
 		Base = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 		FixedDate};
-		StaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete,
-		Done, FixedDate, StaticCategory};
+		StaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDate, ReminderCategory, StaticCategory};
+		ManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDate, ReminderCategory, ManageCategory};
 	}
 }

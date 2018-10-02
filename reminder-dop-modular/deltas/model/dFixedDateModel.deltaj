@@ -39,7 +39,7 @@ delta dFixedDateModel {
 		}
 
 		modifies isValid() {
-			return original() && (date != null && hour != null);
+			return original() &&(date != null && hour != null);
 		}
 	}
 
@@ -61,11 +61,13 @@ delta dFixedDateModel {
 			return DBConstants.REMINDER_HOUR_COLUMN;
 		}
 
-		modifies valuesInsert(ContentValues values, Reminder reminder) {
-			original(values, reminder);
+		modifies createReminderInsert(ContentValues values) throws DBException {
+			Reminder reminder = original(values);
 			reminder.setDate(values.getAsString(date()));
 			reminder.setHour(values.getAsString(hour()));
+			return reminder;
 		}
+
 	}
 
 	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {

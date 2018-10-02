@@ -203,7 +203,7 @@ delta dCreateGUI {
 				}
 			}
 
-			private void reminderFromIntent(Intent intent) {
+			private void reminderFromIntent(Intent intent) throws Exception {
 				String text = intent.getStringExtra("text");
 				String details = intent.getStringExtra("details");
 				reminder.setText(text);
