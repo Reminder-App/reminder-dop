@@ -283,19 +283,19 @@ delta dCreateGUI {
 				setValuesOnReminder();
 			}
 			catch(InvalidTextException e) {
-				Toast.makeText(getApplicationContext(), "Texto inválido.",
+				Toast.makeText(getApplicationContext(), "Invalid text.",
 					Toast.LENGTH_SHORT).show();
 			}
 			catch(InvalidDateException e) {
-				Toast.makeText(getApplicationContext(), "Data inválida.",
+				Toast.makeText(getApplicationContext(), "Invalid date.",
 					Toast.LENGTH_SHORT).show();
 			}
 			catch(InvalidHourException e) {
-				Toast.makeText(getApplicationContext(), "Hora inválida.",
+				Toast.makeText(getApplicationContext(), "Invalid time.",
 					Toast.LENGTH_SHORT).show();
 			}
 			catch(Exception e) {
-				Toast.makeText(getApplicationContext(), "Erro grave.",
+				Toast.makeText(getApplicationContext(), "Serious error.",
 					Toast.LENGTH_SHORT).show();
 			}
 		}

@@ -3,7 +3,7 @@ delta dCreateFixedDateGUI {
 		adds import br.unb.cic.reminders.model.InvalidDateException;
 		adds import br.unb.cic.reminders.model.InvalidFormatException;
 		adds import br.unb.cic.reminders.model.InvalidTextException;
-		
+
 		adds private Reminder createReminder() {
 
 			Reminder reminder = new Reminder();
@@ -11,15 +11,15 @@ delta dCreateFixedDateGUI {
 				setCreateReminder(reminder);
 			}
 			catch(InvalidTextException e) {
-				Toast.makeText(getApplicationContext(), "Texto invalido.",
+				Toast.makeText(getApplicationContext(), "Invalid text.",
 					Toast.LENGTH_SHORT).show();
 			}
 			catch(InvalidDateException e) {
-				Toast.makeText(getApplicationContext(), "Data invalida.",
+				Toast.makeText(getApplicationContext(), "Invalid date.",
 					Toast.LENGTH_SHORT).show();
 			}
 			catch(InvalidHourException e) {
-				Toast.makeText(getApplicationContext(), "Hora invalida.",
+				Toast.makeText(getApplicationContext(), "Invalid time.",
 					Toast.LENGTH_SHORT).show();
 			}
 			return reminder;
