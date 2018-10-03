@@ -281,6 +281,7 @@ delta dManageCategoryGUI {
 		adds import android.view.ContextMenu;
 		adds import android.view.ContextMenu.ContextMenuInfo;
 		adds import android.view.MenuInflater;
+		adds import android.widget.AdapterView.AdapterContextMenuInfo;
 
 		adds public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
@@ -289,6 +290,11 @@ delta dManageCategoryGUI {
 			menu.setHeaderTitle(R.string.context_menu_category_title);
 
 			MenuInflater inflater = getActivity().getMenuInflater();
+
+			if (((AdapterContextMenuInfo)menuInfo).position < 1) {
+				return;
+			}
+
 			inflater.inflate(R.menu.category_list_fragment_context_menu, menu);
 		}
 
@@ -311,6 +317,7 @@ delta dManageCategoryGUI {
 					case R.id.delete : try {
 						Controller.instance(getActivity().getApplicationContext()).deleteReminderByCategory(category);
 						Controller.instance(getActivity().getApplicationContext()).deleteCategory(category);
+						return true;
 					}
 					catch(DBException e) {
 						Log.e(TAG, e.getMessage());
