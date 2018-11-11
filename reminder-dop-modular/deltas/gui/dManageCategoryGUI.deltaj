@@ -381,7 +381,6 @@ delta dManageCategoryGUI {
 		modifies getView(int position, View convertView, ViewGroup parent) {
 			LinearLayout filterRow;
 
-			// Inflate the view
 			if(convertView == null) {
 				filterRow = new LinearLayout(getContext());
 				String inflater = Context.LAYOUT_INFLATER_SERVICE;
