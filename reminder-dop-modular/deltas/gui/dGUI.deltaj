@@ -144,6 +144,8 @@ delta dGUI {
 
 			private int rowType = NEXT_DAYS;
 
+			private TextView tvReminder;
+
 			public static final int LATE = 0;
 			public static final int TODAY = 1;
 			public static final int NEXT_DAYS = 2;
@@ -186,7 +188,7 @@ delta dGUI {
 			}
 
 			private void view(int position, LinearLayout reminderRow) {
-				TextView tvReminder = (TextView)reminderRow.findViewById(R.id.txtReminder);
+				tvReminder = (TextView)reminderRow.findViewById(R.id.txtReminder);
 				tvReminder.setTextColor(rowColor);
 				tvReminder.setText(getItem(position).getText());
 			}

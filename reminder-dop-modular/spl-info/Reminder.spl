@@ -1,7 +1,7 @@
 SPL Reminder {
 
 	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
-	FixedDate, ReminderCategory, StaticCategory, ManageCategory}
+	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
@@ -12,11 +12,12 @@ SPL Reminder {
 		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
 		dCreateFixedDateGUI, dViewFixedDateGUI,
 		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder,
-		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel
+		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel,
+		dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder, dStaticCategoryPriorityGUI
 	}
 
 	Constraints {
-		Reminder & GUI & ManageReminder & FixedDate | ReminderCategory;
+		Reminder & GUI & ManageReminder & FixedDate | ReminderCategory | ReminderPriority;
 		ManageReminder & (Create & Edit & View & Delete & Done);
 		ReminderCategory & (StaticCategory ^ ManageCategory);
 	}
@@ -41,6 +42,8 @@ SPL Reminder {
 		{dViewFixedDateGUI} when (GUI & View & FixedDate);
 
 		{dCreateFixedDateGUI} when (GUI & Create & FixedDate);
+		
+		{dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder} when (ReminderPriority);
 
 		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
 		dStaticCategoryPersistence, dStaticCategoryReminder} when (StaticCategory);
@@ -58,5 +61,8 @@ SPL Reminder {
 		FixedDate, ReminderCategory, StaticCategory};
 		ManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 		FixedDate, ReminderCategory, ManageCategory};
+		
+		Priority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDate, ReminderPriority};
 	}
 }
