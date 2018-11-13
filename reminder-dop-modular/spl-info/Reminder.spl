@@ -9,13 +9,14 @@ SPL Reminder {
 		dViewGUI, dViewController, dViewModel,
 		dDeleteController, dDeleteModel,
 		dDoneGUI, dDoneModel,
-		dFixedDateGUI, dFixedDateModel, dFixedDateUtil,
-		dCreateFixedDateGUI, dViewFixedDateGUI,
+		dFixedDateGUI, dFixedDateModel,
+		dViewFixedDateGUI,
 		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder,
 		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel,
 		dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder, dStaticCategoryPriorityGUI,
-		dDateRangeGUI, dDateRangeModel, dDateRangeUtil,
-		dCreateDateRangeGUI, dViewDateRangeGUI
+		dDateRangeGUI, dDateRangeModel,
+		dViewDateRangeGUI,
+		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI
 	}
 
 	Constraints {
@@ -40,17 +41,15 @@ SPL Reminder {
 
 		{dDoneGUI, dDoneModel} when (Done);
 
-		{dFixedDateGUI, dFixedDateModel, dFixedDateUtil} when (FixedDate);
+		{dFixedDateGUI, dFixedDateModel} when (FixedDate);
 
 		{dViewFixedDateGUI} when (GUI & View & FixedDate);
-
-		{dCreateFixedDateGUI} when (GUI & Create & FixedDate);
 		
-		{dDateRangeGUI, dDateRangeModel, dDateRangeUtil} when (DateRange);
+		{dDateRangeGUI, dDateRangeModel} when (DateRange);
 
 		{dViewDateRangeGUI} when (GUI & View & DateRange);
-
-		{dCreateDateRangeGUI} when (GUI & Create & DateRange);
+		
+		{dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI} when (DateRange | FixedDate);
 		
 		{dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder} when (ReminderPriority);
 

@@ -1,4 +1,4 @@
-delta dFixedDateUtil {
+delta dDateRangeFixedDateUtil {
 	adds {
 		package util;
 

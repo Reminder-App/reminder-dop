@@ -130,23 +130,6 @@ delta dFixedDateGUI {
 			time.set(Calendar.HOUR_OF_DAY, hour);
 		}
 
-		adds @SuppressWarnings("unchecked")
-		protected void updateSpinnerDateHour(Spinner spinner, String dateOrHour) {
-			if(dateOrHour == null) return;
-
-			ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
-			spinner.getAdapter();
-
-			int count = adapter.getCount();
-			if(count > 2) {
-				for(int i = 2;
-					i < count;
-					++ i) adapter.remove(adapter.getItem(i));
-			}
-			adapter.add(dateOrHour);
-			spinner.setSelection(2);
-		}
-
 		adds private Spinner getSpinnerDate() {
 			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerDate);
 

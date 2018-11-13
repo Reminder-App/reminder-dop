@@ -1,4 +1,4 @@
-delta dCreateFixedDateGUI {
+delta dCreateDateRangeFixedDateGUI {
 	modifies br.unb.cic.reminders.view.ReminderAddActivity {
 		adds import br.unb.cic.reminders.model.InvalidDateException;
 		adds import br.unb.cic.reminders.model.InvalidFormatException;
