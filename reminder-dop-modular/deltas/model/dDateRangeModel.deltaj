@@ -1,0 +1,121 @@
+delta dDateRangeModel {
+	modifies br.unb.cic.reminders.model.Reminder {
+		adds import br.unb.cic.reminders.view.InvalidHourException;
+
+		adds @Column(column = "INITIAL_DATE", type = DBTypes.TEXT) private String dateStart;
+		adds @Column(column = "INITIAL_HOUR", type = DBTypes.TEXT) private String hourStart;
+		adds @Column(column = "FINAL_DATE", type = DBTypes.TEXT) private String dateFinal;
+		adds @Column(column = "FINAL_HOUR", type = DBTypes.TEXT) private String hourFinal;
+
+		adds public String getDateStart() {
+			return dateStart;
+		}
+		
+		adds public void setDateStart(String dateStart) {
+			if (dateStart == null) throw new InvalidDateException(dateStart);
+			if (!(dateStart == null || dateStart.equals("")) && !checkFormat(dateStart, Patterns.DATE_PATTERN)) {
+				throw new InvalidDateException(dateStart);
+			}
+			this.dateStart = dateStart;
+		}
+
+		adds public String getHourStart() {
+			return hourStart;
+		}
+		
+		adds public void setHourStart(String hourStart) {
+			if (!(hourStart == null || hourStart.equals("")) && !checkFormat(hourStart, Patterns.HOUR_PATTERN)) {
+				throw new InvalidHourException(hourStart);
+			}
+			this.hourStart = hourStart;
+		}
+
+		adds public String getDateFinal() {
+			return dateFinal;
+		}
+		
+		adds public void setDateFinal(String dateFinal) {
+
+			if (dateFinal == null) throw new InvalidDateException(dateFinal);
+			if (!(dateFinal == null || dateFinal.equals("")) && !checkFormat(dateFinal, Patterns.DATE_PATTERN)) {
+				throw new InvalidDateException(dateFinal);
+			}
+			this.dateFinal = dateFinal;
+		}
+		
+		adds public String getHourFinal() {
+			return hourFinal;
+		}
+		
+		adds public void setHourFinal(String hourFinal) {
+			if (!(hourFinal == null || hourFinal.equals("")) && !checkFormat(hourFinal, Patterns.HOUR_PATTERN)) {
+				throw new InvalidHourException(hourFinal);
+			}
+			this.hourFinal = hourFinal;
+		}
+		
+		adds private boolean checkFormat(String date, String pattern) {
+			Pattern p = Pattern.compile(pattern);
+			Matcher m = p.matcher(date);
+			return m.matches();
+		}
+
+		modifies isValid() {
+			return original() && (dateStart != null && hourStart != null && dateFinal != null && hourFinal != null);
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.db.DBConstants {
+		adds public static String REMINDER_INITIAL_DATE_COLUMN = "INITIAL_DATE";
+		adds public static String REMINDER_INITIAL_HOUR_COLUMN = "INITIAL_HOUR";
+		adds public static String REMINDER_FINAL_DATE_COLUMN = "FINAL_DATE";
+		adds public static String REMINDER_FINAL_HOUR_COLUMN = "FINAL_HOUR";
+
+		modifies tableStatement() {
+			return original() + "INITIAL_DATE CHAR(10) NOT NULL,"
+				+ "INITIAL_HOUR CHAR(5) NULL," + "FINAL_DATE CHAR(10) NOT NULL,"
+				+ "FINAL_HOUR CHAR(5) NULL,";
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.cp.ReminderContentProvider {
+		adds public static final String dateStart() {
+			return DBConstants.REMINDER_INITIAL_DATE_COLUMN;
+		}
+		adds public static final String hourStart() {
+			return DBConstants.REMINDER_INITIAL_HOUR_COLUMN;
+		}
+		adds public static final String dateFinal() {
+			return DBConstants.REMINDER_FINAL_DATE_COLUMN;
+		}
+		adds public static final String hourFinal() {
+			return DBConstants.REMINDER_FINAL_HOUR_COLUMN;
+		}
+
+		modifies createReminderInsert(ContentValues values) throws DBException {
+			Reminder reminder = original(values);
+			reminder.setDateStart(values.getAsString(dateStart()));
+			reminder.setHourStart(values.getAsString(hourStart()));
+			reminder.setDateFinal(values.getAsString(dateFinal()));
+			reminder.setHourFinal(values.getAsString(hourFinal()));
+			return reminder;
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		modifies valuesCursorToReminder(Cursor cursor, Reminder reminder) {
+			original(cursor, reminder);
+
+			String dateStart = cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_INITIAL_DATE_COLUMN));
+			String hourStart = cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_INITIAL_HOUR_COLUMN));
+			String dateFinal = cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_FINAL_DATE_COLUMN));
+			String hourFinal = cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_FINAL_HOUR_COLUMN));
+			
+			reminder.setDateStart(dateStart);
+			reminder.setHourStart(hourStart);
+			reminder.setDateFinal(dateFinal);
+			reminder.setHourFinal(hourFinal);
+		}
+	}
+
+}

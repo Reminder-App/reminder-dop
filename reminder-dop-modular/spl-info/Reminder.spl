@@ -1,7 +1,7 @@
 SPL Reminder {
 
 	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
-	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority}
+	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority, ReminderSchedule, DateRange}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
@@ -13,13 +13,16 @@ SPL Reminder {
 		dCreateFixedDateGUI, dViewFixedDateGUI,
 		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder,
 		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel,
-		dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder, dStaticCategoryPriorityGUI
+		dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder, dStaticCategoryPriorityGUI,
+		dDateRangeGUI, dDateRangeModel, dDateRangeUtil,
+		dCreateDateRangeGUI, dViewDateRangeGUI
 	}
 
 	Constraints {
-		Reminder & GUI & ManageReminder & FixedDate | ReminderCategory | ReminderPriority;
+		Reminder & GUI & ManageReminder & ReminderSchedule | ReminderCategory | ReminderPriority;
 		ManageReminder & (Create & Edit & View & Delete & Done);
 		ReminderCategory & (StaticCategory ^ ManageCategory);
+		ReminderSchedule & (FixedDate ^ DateRange);
 	}
 
 	Partitions {
@@ -43,6 +46,12 @@ SPL Reminder {
 
 		{dCreateFixedDateGUI} when (GUI & Create & FixedDate);
 		
+		{dDateRangeGUI, dDateRangeModel, dDateRangeUtil} when (DateRange);
+
+		{dViewDateRangeGUI} when (GUI & View & DateRange);
+
+		{dCreateDateRangeGUI} when (GUI & Create & DateRange);
+		
 		{dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder} when (ReminderPriority);
 
 		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
@@ -51,18 +60,25 @@ SPL Reminder {
 		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
 		dStaticCategoryPersistence, dStaticCategoryReminder, dManageCategoryGUI,
 		dManageCategoryController, dManageCategoryModel} when (ManageCategory);
-
 	}
 
 	Products {
-		Base = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDate = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate};
-		StaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDateStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate, ReminderCategory, StaticCategory};
-		ManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDateManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate, ReminderCategory, ManageCategory};
-		
-		Priority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		FixedDatePriority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate, ReminderPriority};
+		
+		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange};
+		DateRangeStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderCategory, StaticCategory};
+		DateRangeManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderCategory, ManageCategory};
+		DateRangePriority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderPriority};
 	}
 }
