@@ -13,7 +13,8 @@ SPL Reminder {
 		dViewFixedDateGUI,
 		dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel, dStaticCategoryPersistence, dStaticCategoryReminder,
 		dManageCategoryGUI, dManageCategoryController, dManageCategoryModel,
-		dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder, dStaticCategoryPriorityGUI,
+		dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder,
+		dStaticCategoryPriorityGUI, dManageCategoryPriorityGUI,
 		dDateRangeGUI, dDateRangeModel,
 		dViewDateRangeGUI,
 		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI
@@ -59,6 +60,10 @@ SPL Reminder {
 		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
 		dStaticCategoryPersistence, dStaticCategoryReminder, dManageCategoryGUI,
 		dManageCategoryController, dManageCategoryModel} when (ManageCategory);
+		
+		{dStaticCategoryPriorityGUI} when (ReminderPriority & StaticCategory);
+		
+		{dManageCategoryPriorityGUI} when (ReminderPriority & ManageCategory);
 	}
 
 	Products {
@@ -70,6 +75,10 @@ SPL Reminder {
 		FixedDate, ReminderCategory, ManageCategory};
 		FixedDatePriority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate, ReminderPriority};
+		FixedDatePriorityStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, ReminderCategory, StaticCategory, ReminderPriority};
+		FixedDatePriorityManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, ReminderCategory, ManageCategory, ReminderPriority};
 		
 		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		DateRange};
@@ -79,5 +88,9 @@ SPL Reminder {
 		DateRange, ReminderCategory, ManageCategory};
 		DateRangePriority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		DateRange, ReminderPriority};
+		DateRangePriorityStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderCategory, StaticCategory, ReminderPriority};
+		DateRangePriorityManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderCategory, ManageCategory, ReminderPriority};
 	}
 }

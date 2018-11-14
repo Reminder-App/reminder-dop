@@ -2,6 +2,7 @@ delta dStaticCategoryPriorityGUI {
 	modifies br.unb.cic.reminders.view.FilterListFragment {
 		adds import br.unb.cic.reminders.controller.PriorityFilter;
 		adds import br.unb.cic.reminders.model.Priority;
+		
 		modifies listOfFilters() {
 			List<ReminderFilter> filters = original();
 			
