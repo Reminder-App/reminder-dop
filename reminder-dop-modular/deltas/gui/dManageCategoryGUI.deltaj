@@ -314,9 +314,11 @@ delta dManageCategoryGUI {
 						R.string.dialog_editcategory_title);
 					updateListView();
 					return true;
-					case R.id.delete : try {
+					case R.id.delete :
+					try {
 						Controller.instance(getActivity().getApplicationContext()).deleteReminderByCategory(category);
 						Controller.instance(getActivity().getApplicationContext()).deleteCategory(category);
+						updateListView();
 						return true;
 					}
 					catch(DBException e) {
@@ -363,7 +365,7 @@ delta dManageCategoryGUI {
 			adapterCategoryGenerator.getSpinnerAdapter(categories, this);
 
 			Category temp = new Category();
-			temp.setName("+ Categoria");
+			temp.setName("+ Category");
 			adapter.add(temp);
 
 			spinner.setAdapter(adapter);
