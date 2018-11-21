@@ -2,7 +2,7 @@ SPL Reminder {
 
 	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority, ReminderSchedule, DateRange,
-	GoogleCalendar}
+	GoogleCalendar, Search}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
@@ -20,11 +20,13 @@ SPL Reminder {
 		dViewDateRangeGUI,
 		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI,
 		dGoogleCalendarGUI, dGoogleCalendarModel, dGoogleCalendarCalendar,
-		dGoogleCalendarDateRangeCalendar
+		dGoogleCalendarDateRangeCalendar,
+		dSearchGUI, dSearchReminder, dSearchController,
+		dSearchDateRangeGUI
 	}
 
 	Constraints {
-		Reminder & GUI & ManageReminder & ReminderSchedule | ReminderCategory | ReminderPriority | GoogleCalendar;
+		Reminder & GUI & ManageReminder & ReminderSchedule | ReminderCategory | ReminderPriority | GoogleCalendar | Search;
 		ManageReminder & (Create & Edit & View & Delete & Done);
 		ReminderCategory & (StaticCategory ^ ManageCategory);
 		ReminderSchedule & (FixedDate ^ DateRange);
@@ -71,6 +73,10 @@ SPL Reminder {
 		{dGoogleCalendarGUI, dGoogleCalendarModel,dGoogleCalendarCalendar} when (GoogleCalendar);
 		
 		{dGoogleCalendarDateRangeCalendar} when (DateRange & GoogleCalendar);
+		
+		{dSearchGUI, dSearchReminder, dSearchController} when (Search);
+		
+		{dSearchDateRangeGUI} when (DateRange & Search);
 	}
 
 	Products {
@@ -88,6 +94,8 @@ SPL Reminder {
 		FixedDate, ReminderCategory, ManageCategory, ReminderPriority};
 		FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate, GoogleCalendar};
+		FixedDateSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, Search};
 		
 		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		DateRange};
@@ -103,5 +111,7 @@ SPL Reminder {
 		DateRange, ReminderCategory, ManageCategory, ReminderPriority};
 		DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		DateRange, GoogleCalendar};
+		DateRangeSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, Search};
 	}
 }
