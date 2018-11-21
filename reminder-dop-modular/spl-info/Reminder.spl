@@ -1,7 +1,8 @@
 SPL Reminder {
 
 	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
-	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority, ReminderSchedule, DateRange}
+	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority, ReminderSchedule, DateRange,
+	GoogleCalendar}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
@@ -17,11 +18,13 @@ SPL Reminder {
 		dStaticCategoryPriorityGUI, dManageCategoryPriorityGUI,
 		dDateRangeGUI, dDateRangeModel,
 		dViewDateRangeGUI,
-		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI
+		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI,
+		dGoogleCalendarGUI, dGoogleCalendarModel, dGoogleCalendarCalendar,
+		dGoogleCalendarDateRangeCalendar
 	}
 
 	Constraints {
-		Reminder & GUI & ManageReminder & ReminderSchedule | ReminderCategory | ReminderPriority;
+		Reminder & GUI & ManageReminder & ReminderSchedule | ReminderCategory | ReminderPriority | GoogleCalendar;
 		ManageReminder & (Create & Edit & View & Delete & Done);
 		ReminderCategory & (StaticCategory ^ ManageCategory);
 		ReminderSchedule & (FixedDate ^ DateRange);
@@ -64,6 +67,10 @@ SPL Reminder {
 		{dStaticCategoryPriorityGUI} when (ReminderPriority & StaticCategory);
 		
 		{dManageCategoryPriorityGUI} when (ReminderPriority & ManageCategory);
+		
+		{dGoogleCalendarGUI, dGoogleCalendarModel,dGoogleCalendarCalendar} when (GoogleCalendar);
+		
+		{dGoogleCalendarDateRangeCalendar} when (DateRange & GoogleCalendar);
 	}
 
 	Products {
@@ -79,6 +86,8 @@ SPL Reminder {
 		FixedDate, ReminderCategory, StaticCategory, ReminderPriority};
 		FixedDatePriorityManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		FixedDate, ReminderCategory, ManageCategory, ReminderPriority};
+		FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, GoogleCalendar};
 		
 		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		DateRange};
@@ -92,5 +101,7 @@ SPL Reminder {
 		DateRange, ReminderCategory, StaticCategory, ReminderPriority};
 		DateRangePriorityManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
 		DateRange, ReminderCategory, ManageCategory, ReminderPriority};
+		DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, GoogleCalendar};
 	}
 }
