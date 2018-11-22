@@ -10,11 +10,17 @@
 					<feature mandatory="true" name="Done"/>
 				</and>
 				<feature mandatory="true" name="GUI"/>
-        <feature mandatory="true" name="Fixed Date"/>
+				<alt mandatory="true" name="Reminder Schedule">
+					<feature name="Date Range"/>
+					<feature name="Fixed Date"/>
+				</alt>
 				<alt name="Reminder Category">
 					<feature name="Manage Category"/>
 					<feature name="Static Category"/>
 				</alt>
+				<feature name="Reminder Priority"/>
+				<feature name="Google Calendar"/>
+				<feature name="Search"/>
 			</and>
 		</struct>
 		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
