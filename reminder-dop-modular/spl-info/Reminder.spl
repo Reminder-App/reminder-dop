@@ -80,38 +80,138 @@ SPL Reminder {
 	}
 
 	Products {
-		FixedDate = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		/* Products with Fixed Date feature */
+		FixedDate = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 		FixedDate};
-		FixedDateStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, ReminderCategory, StaticCategory};
-		FixedDateManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, ReminderCategory, ManageCategory};
-		FixedDatePriority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, ReminderPriority};
-		FixedDatePriorityStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, ReminderCategory, StaticCategory, ReminderPriority};
-		FixedDatePriorityManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, ReminderCategory, ManageCategory, ReminderPriority};
-		FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, GoogleCalendar};
-		FixedDateSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		FixedDate, Search};
-		
-		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, FixedDate, GoogleCalendar};
+		FixedDateGoogleCalendarSearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, FixedDate, GoogleCalendar, Search};
+		FixedDateManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, FixedDate, ManageCategory};
+		FixedDateManageCategoryGoogleCalendar = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ManageCategory, GoogleCalendar};
+		FixedDateManageCategoryGoogleCalendarSearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ManageCategory, GoogleCalendar, Search};
+		FixedDateManageCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, FixedDate, ManageCategory, Search};
+		FixedDatePriority = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, FixedDate, ReminderPriority};
+		FixedDatePriorityGoogleCalendar = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, FixedDate, ReminderPriority,
+		GoogleCalendar};
+		FixedDatePriorityGoogleCalendarSearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ReminderPriority, GoogleCalendar, Search};
+		FixedDatePriorityManageCategory = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, FixedDate, ReminderPriority,
+		ManageCategory};
+		FixedDatePriorityManageCategoryGoogleCalendar = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, ReminderPriority, ManageCategory, GoogleCalendar};
+		FixedDatePriorityManageCategoryGoogleCalendarSearch = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, ReminderPriority, ManageCategory, GoogleCalendar, Search};
+		FixedDatePriorityManageCategorySearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ReminderPriority, ManageCategory, Search};
+		FixedDatePrioritySearch = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, FixedDate, ReminderPriority, Search};
+		FixedDatePriorityStaticCategory = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, FixedDate, ReminderPriority,
+		StaticCategory};
+		FixedDatePriorityStaticCategoryGoogleCalendar = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, ReminderPriority, ReminderCategory, StaticCategory,
+		GoogleCalendar};
+		FixedDatePriorityStaticCategoryGoogleCalendarSearch = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		FixedDate, ReminderPriority, ReminderCategory, StaticCategory,
+		GoogleCalendar, Search};
+		FixedDatePriorityStaticCategorySearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ReminderPriority, ReminderCategory, StaticCategory, Search};
+		FixedDateSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete,
+		Done, ReminderSchedule, FixedDate, Search};
+		FixedDateStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, FixedDate, StaticCategory};
+		FixedDateStaticCategoryGoogleCalendar = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ReminderCategory, StaticCategory, GoogleCalendar};
+		FixedDateStaticCategoryGoogleCalendarSearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, FixedDate,
+		ReminderCategory, StaticCategory, GoogleCalendar, Search};
+		FixedDateStaticCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, FixedDate, ReminderCategory,
+		StaticCategory, Search};
+
+		/* Products with Date Range feature */
+		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 		DateRange};
-		DateRangeStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, ReminderCategory, StaticCategory};
-		DateRangeManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, ReminderCategory, ManageCategory};
-		DateRangePriority = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, ReminderPriority};
-		DateRangePriorityStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, ReminderCategory, StaticCategory, ReminderPriority};
-		DateRangePriorityManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, ReminderCategory, ManageCategory, ReminderPriority};
-		DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, GoogleCalendar};
-		DateRangeSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
-		DateRange, Search};
+		DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRange, GoogleCalendar};
+		DateRangeGoogleCalendarSearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, DateRange, GoogleCalendar, Search};
+		DateRangeManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRange, ManageCategory};
+		DateRangeManageCategoryGoogleCalendar = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ManageCategory, GoogleCalendar};
+		DateRangeManageCategoryGoogleCalendarSearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ManageCategory, GoogleCalendar, Search};
+		DateRangeManageCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, DateRange, ManageCategory, Search};
+		DateRangePriority = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRange, ReminderPriority};
+		DateRangePriorityGoogleCalendar = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, DateRange, ReminderPriority,
+		GoogleCalendar};
+		DateRangePriorityGoogleCalendarSearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ReminderPriority, GoogleCalendar, Search};
+		DateRangePriorityManageCategory = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, DateRange, ReminderPriority,
+		ManageCategory};
+		DateRangePriorityManageCategoryGoogleCalendar = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderPriority, ManageCategory, GoogleCalendar};
+		DateRangePriorityManageCategoryGoogleCalendarSearch = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderPriority, ManageCategory, GoogleCalendar, Search};
+		DateRangePriorityManageCategorySearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ReminderPriority, ManageCategory, Search};
+		DateRangePrioritySearch = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRange, ReminderPriority, Search};
+		DateRangePriorityStaticCategory = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, DateRange, ReminderPriority,
+		StaticCategory};
+		DateRangePriorityStaticCategoryGoogleCalendar = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderPriority, ReminderCategory, StaticCategory,
+		GoogleCalendar};
+		DateRangePriorityStaticCategoryGoogleCalendarSearch = {Reminder, GUI,
+		ManageReminder, Create, Edit, View, Delete, Done, ReminderSchedule,
+		DateRange, ReminderPriority, ReminderCategory, StaticCategory,
+		GoogleCalendar, Search};
+		DateRangePriorityStaticCategorySearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ReminderPriority, ReminderCategory, StaticCategory, Search};
+		DateRangeSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete,
+		Done, ReminderSchedule, DateRange, Search};
+		DateRangeStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRange, StaticCategory};
+		DateRangeStaticCategoryGoogleCalendar = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ReminderCategory, StaticCategory, GoogleCalendar};
+		DateRangeStaticCategoryGoogleCalendarSearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRange,
+		ReminderCategory, StaticCategory, GoogleCalendar, Search};
+		DateRangeStaticCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, DateRange, ReminderCategory,
+		StaticCategory, Search};
 	}
 }
