@@ -82,7 +82,7 @@ SPL Reminder {
 	Products {
 		/* Products with Fixed Date feature */
 		FixedDate = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
-		FixedDate};
+		ReminderSchedule, FixedDate};
 		FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
 		Delete, Done, ReminderSchedule, FixedDate, GoogleCalendar};
 		FixedDateGoogleCalendarSearch = {Reminder, GUI, ManageReminder, Create, Edit,
@@ -149,7 +149,7 @@ SPL Reminder {
 
 		/* Products with Date Range feature */
 		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
-		DateRange};
+		ReminderSchedule, DateRange};
 		DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
 		Delete, Done, ReminderSchedule, DateRange, GoogleCalendar};
 		DateRangeGoogleCalendarSearch = {Reminder, GUI, ManageReminder, Create, Edit,
