@@ -326,12 +326,56 @@ delta dStaticCategoryGUI {
 	}
 
 	modifies br.unb.cic.reminders.view.ReminderListFragment {
+		adds import android.app.FragmentTransaction; 
+		
 		modifies setIntent(Reminder reminder, Intent editIntent) {
 			original(reminder, editIntent);
 
 			editIntent.putExtra("category_name", reminder.getCategory().getName());
 			editIntent.putExtra("category_id",
 				Long.toString(reminder.getCategory().getId()));
+		}
+		
+		adds public void reloadFilterListFragment() {
+			Fragment currentFragment =
+			getActivity().getFragmentManager().findFragmentById(R.id.listCategories);
+			if(currentFragment instanceof FilterListFragment) {
+				FragmentTransaction fragTransaction
+				=(getActivity()).getFragmentManager().beginTransaction();
+				fragTransaction.detach(currentFragment);
+				fragTransaction.attach(currentFragment);
+				fragTransaction.commit();
+			}
+		}
+
+		modifies onContextItemSelected(MenuItem item) {
+			if(item.getGroupId() == R.id.context_menu_reminder) {
+
+				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+				Reminder reminder = (Reminder) contextMenuAdapter.getItem(info.position);
+
+				switch(item.getItemId()) {
+					case R.id.edit : Intent editIntent = new
+						Intent(getActivity().getApplicationContext(), EditReminderActivity.class);
+						setIntent(reminder, editIntent);
+						startActivity(editIntent);
+						updateListView(null);
+						return true;
+					case R.id.delete : 
+						try {
+							Controller.instance(getActivity().getApplicationContext()).deleteReminder(reminder);
+						}
+						catch(DBException e) {
+							Log.e(TAG, e.getMessage());
+						}
+						reloadFilterListFragment();
+						updateListView(null);
+						return true;
+					default : 
+						return super.onContextItemSelected(item);
+				}
+			}
+			return super.onContextItemSelected(item);
 		}
 	}
 

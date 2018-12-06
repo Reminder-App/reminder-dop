@@ -15,4 +15,8 @@ delta dStaticCategoryPriorityGUI {
 			return filters;
 		}
 	}
+	
+	modifies br.unb.cic.reminders.view.ReminderListFragment {
+		removes reloadFilterListFragment();
+	}
 }
