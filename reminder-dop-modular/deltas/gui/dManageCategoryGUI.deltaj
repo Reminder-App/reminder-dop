@@ -281,6 +281,7 @@ delta dManageCategoryGUI {
 		adds import android.view.ContextMenu;
 		adds import android.view.ContextMenu.ContextMenuInfo;
 		adds import android.view.MenuInflater;
+		adds import android.app.FragmentTransaction;
 		adds import android.widget.AdapterView.AdapterContextMenuInfo;
 
 		adds public void onCreateContextMenu(ContextMenu menu, View v,
@@ -296,6 +297,16 @@ delta dManageCategoryGUI {
 			}
 
 			inflater.inflate(R.menu.category_list_fragment_context_menu, menu);
+		}
+		
+		adds public void reloadReminderListFragment() {
+			Fragment currentFragment = getActivity().getFragmentManager().findFragmentById(R.id.listReminders);
+			if (currentFragment instanceof ReminderListFragment) {
+				FragmentTransaction fragTransaction = (getActivity()).getFragmentManager().beginTransaction();
+				fragTransaction.detach(currentFragment);
+				fragTransaction.attach(currentFragment);
+				fragTransaction.commit();
+			}
 		}
 
 		adds @Override
@@ -324,6 +335,7 @@ delta dManageCategoryGUI {
 					catch(DBException e) {
 						Log.e(TAG, e.getMessage());
 					}
+					reloadReminderListFragment();
 					updateListView();
 					return true;
 					default : return super.onContextItemSelected(item);
