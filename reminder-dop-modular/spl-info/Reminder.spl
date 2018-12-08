@@ -2,7 +2,7 @@ SPL Reminder {
 
 	Features = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 	FixedDate, ReminderCategory, StaticCategory, ManageCategory, ReminderPriority, ReminderSchedule, DateRange,
-	GoogleCalendar, Search}
+	GoogleCalendar, Search, DateRepeat}
 
 	Deltas = {dPersistence, dModel, dController, dReminder, dUtil, dGUI,
 		dCreateGUI, dCreateController, dCreateModel,
@@ -18,18 +18,23 @@ SPL Reminder {
 		dStaticCategoryPriorityGUI, dManageCategoryPriorityGUI,
 		dDateRangeGUI, dDateRangeModel,
 		dViewDateRangeGUI,
-		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI,
+		dDateRangeFixedDateGUI, dDateRangeFixedDateUtil,
 		dGoogleCalendarGUI, dGoogleCalendarModel, dGoogleCalendarCalendar,
 		dGoogleCalendarDateRangeCalendar,
 		dSearchGUI, dSearchReminder, dSearchController,
-		dSearchDateRangeGUI
+		dSearchDateRangeGUI,
+		dDateRepeatGUI, dDateRepeatModel,
+		dViewDateRepeatGUI,
+		dDateRepeatFixedDateModel, dDateRepeatFixedDateGUI,
+		dSearchDateRepeatGUI
 	}
 
 	Constraints {
 		Reminder & GUI & ManageReminder & ReminderSchedule | ReminderCategory | ReminderPriority | GoogleCalendar | Search;
 		ManageReminder & (Create & Edit & View & Delete & Done);
 		ReminderCategory & (StaticCategory ^ ManageCategory);
-		ReminderSchedule & (FixedDate ^ DateRange);
+		ReminderSchedule & (FixedDate ^ DateRange ^ DateRepeat);
+		DateRepeat IMPLIES ~GoogleCalendar;
 	}
 
 	Partitions {
@@ -47,16 +52,23 @@ SPL Reminder {
 
 		{dDoneGUI, dDoneModel} when (Done);
 
-		{dFixedDateGUI, dFixedDateModel} when (FixedDate);
+		{dFixedDateGUI, dFixedDateModel, dDateRangeFixedDateGUI, dDateRangeFixedDateUtil,
+		dDateRepeatFixedDateModel, dDateRepeatFixedDateGUI} when (FixedDate);
 
 		{dViewFixedDateGUI} when (GUI & View & FixedDate);
 		
-		{dDateRangeGUI, dDateRangeModel} when (DateRange);
+		{dDateRangeGUI, dDateRangeModel, dDateRangeFixedDateGUI, dDateRangeFixedDateUtil} when (DateRange);
 
 		{dViewDateRangeGUI} when (GUI & View & DateRange);
 		
-		{dDateRangeFixedDateGUI, dDateRangeFixedDateUtil, dCreateDateRangeFixedDateGUI} when (DateRange | FixedDate);
+		{dDateRepeatGUI, dDateRepeatModel, dDateRepeatFixedDateModel, dDateRepeatFixedDateGUI} when (DateRepeat);
+
+		{dViewDateRepeatGUI} when (GUI & View & DateRepeat);
 		
+		//{dDateRangeFixedDateGUI, dDateRangeFixedDateUtil} when (DateRange |  FixedDate);
+		
+		//{dDateRepeatFixedDateModel, dDateRepeatFixedDateGUI} when (DateRepeat | FixedDate);
+
 		{dPriorityGUI, dPriorityController, dPriorityModel, dPriorityReminder} when (ReminderPriority);
 
 		{dStaticCategoryGUI, dStaticCategoryController, dStaticCategoryModel,
@@ -77,13 +89,15 @@ SPL Reminder {
 		{dSearchGUI, dSearchReminder, dSearchController} when (Search);
 		
 		{dSearchDateRangeGUI} when (DateRange & Search);
+		
+		{dSearchDateRepeatGUI} when (DateRepeat & Search);
 	}
 
 	Products {
-		/* Products with Fixed Date feature */
+		///* Products with Fixed Date feature
 		FixedDate = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 		ReminderSchedule, FixedDate};
-		FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		/*FixedDateGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
 		Delete, Done, ReminderSchedule, FixedDate, GoogleCalendar};
 		FixedDateGoogleCalendarSearch = {Reminder, GUI, ManageReminder, Create, Edit,
 		View, Delete, Done, ReminderSchedule, FixedDate, GoogleCalendar, Search};
@@ -145,12 +159,12 @@ SPL Reminder {
 		ReminderCategory, StaticCategory, GoogleCalendar, Search};
 		FixedDateStaticCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
 		View, Delete, Done, ReminderSchedule, FixedDate, ReminderCategory,
-		StaticCategory, Search};
+		StaticCategory, Search}; */
 
-		/* Products with Date Range feature */
+		//Products with Date Range feature 
 		DateRange = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
 		ReminderSchedule, DateRange};
-		DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		/*DateRangeGoogleCalendar = {Reminder, GUI, ManageReminder, Create, Edit, View,
 		Delete, Done, ReminderSchedule, DateRange, GoogleCalendar};
 		DateRangeGoogleCalendarSearch = {Reminder, GUI, ManageReminder, Create, Edit,
 		View, Delete, Done, ReminderSchedule, DateRange, GoogleCalendar, Search};
@@ -212,6 +226,37 @@ SPL Reminder {
 		ReminderCategory, StaticCategory, GoogleCalendar, Search};
 		DateRangeStaticCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
 		View, Delete, Done, ReminderSchedule, DateRange, ReminderCategory,
+		StaticCategory, Search}; */
+		
+		/* Products with Date Repeat feature */
+		DateRepeat = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete, Done,
+		ReminderSchedule, DateRepeat};
+		DateRepeatManageCategory = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRepeat, ManageCategory};
+		DateRepeatManageCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, DateRepeat, ManageCategory, Search};
+		DateRepeatPriority = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRepeat, ReminderPriority};
+		DateRepeatPriorityManageCategory = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, DateRepeat, ReminderPriority,
+		ManageCategory};
+		DateRepeatPriorityManageCategorySearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRepeat,
+		ReminderPriority, ManageCategory, Search};
+		DateRepeatPrioritySearch = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRepeat, ReminderPriority, Search};
+		DateRepeatPriorityStaticCategory = {Reminder, GUI, ManageReminder, Create,
+		Edit, View, Delete, Done, ReminderSchedule, DateRepeat, ReminderPriority,
+		StaticCategory};
+		DateRepeatPriorityStaticCategorySearch = {Reminder, GUI, ManageReminder,
+		Create, Edit, View, Delete, Done, ReminderSchedule, DateRepeat,
+		ReminderPriority, ReminderCategory, StaticCategory, Search};
+		DateRepeatSearch = {Reminder, GUI, ManageReminder, Create, Edit, View, Delete,
+		Done, ReminderSchedule, DateRepeat, Search};
+		DateRepeatStaticCategory = {Reminder, GUI, ManageReminder, Create, Edit, View,
+		Delete, Done, ReminderSchedule, DateRepeat, StaticCategory};
+		DateRepeatStaticCategorySearch = {Reminder, GUI, ManageReminder, Create, Edit,
+		View, Delete, Done, ReminderSchedule, DateRepeat, ReminderCategory,
 		StaticCategory, Search};
 	}
 }

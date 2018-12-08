@@ -41,11 +41,14 @@ delta dDateRangeGUI {
 		modifies createListView() {
 			original();
 
-			lvReminderLate = ( ListView ) view.findViewById(R.id.lvRemindersLate);
-			lvReminderToday = ( ListView ) view.findViewById(R.id.lvRemindersToday);
-			lvReminderNextDays = ( ListView )
-			view.findViewById(R.id.lvRemindersNextDays);
-			updateListView(null);
+			lvReminderLate = (ListView) view.findViewById(R.id.lvRemindersLate);
+			lvReminderToday = (ListView) view.findViewById(R.id.lvRemindersToday);
+			lvReminderNextDays = (ListView) view.findViewById(R.id.lvRemindersNextDays);
+		}
+		
+		modifies valuesForRegister(){
+			original();
+			
 			registerForContextMenu(lvReminderLate);
 			registerForContextMenu(lvReminderToday);
 			registerForContextMenu(lvReminderNextDays);
@@ -279,7 +282,7 @@ delta dDateRangeGUI {
 		}
 
 		adds private Spinner getSpinnerDateStart() {
-			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerDateStart);
+			Spinner spinner = (Spinner) findViewById(R.id.spinnerDateStart);
 
 			SpinnerAdapterGenerator<String> adapterDateGenerator = new
 			SpinnerAdapterGenerator<String>();
@@ -295,7 +298,7 @@ delta dDateRangeGUI {
 		}
 
 		adds private Spinner getSpinnerTimeStart() {
-			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerTimeStart);
+			Spinner spinner = (Spinner) findViewById(R.id.spinnerTimeStart);
 
 			SpinnerAdapterGenerator<String> adapterTimeGenerator = new
 			SpinnerAdapterGenerator<String>();
@@ -311,7 +314,7 @@ delta dDateRangeGUI {
 		}
 
 		adds private Spinner getSpinnerDateFinal() {
-			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerDateFinal);
+			Spinner spinner = (Spinner) findViewById(R.id.spinnerDateFinal);
 
 			SpinnerAdapterGenerator<String> adapterDateGenerator = new
 			SpinnerAdapterGenerator<String>();
@@ -327,7 +330,7 @@ delta dDateRangeGUI {
 		}
 
 		adds private Spinner getSpinnerTimeFinal() {
-			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerTimeFinal);
+			Spinner spinner = (Spinner) findViewById(R.id.spinnerTimeFinal);
 
 			SpinnerAdapterGenerator<String> adapterTimeGenerator = new
 			SpinnerAdapterGenerator<String>();
@@ -341,6 +344,27 @@ delta dDateRangeGUI {
 
 			return spinner;
 		}
+		
+		adds private String dateToString(Calendar date) {
+			if(date == null) return null;
+			String sDate;
+			sDate = Integer.toString(date.get(Calendar.MONTH) + 1);
+			if(date.get(Calendar.MONTH) + 1 < 10) sDate = "0" + sDate;
+			sDate = Integer.toString(date.get(Calendar.DAY_OF_MONTH)) + "-" + sDate;
+			if(date.get(Calendar.DAY_OF_MONTH) < 10) sDate = "0" + sDate;
+			sDate += "-" + Integer.toString(date.get(Calendar.YEAR));
+			return sDate;
+		}
+
+		adds private String timeToString(Calendar time) {
+			if(time == null) return null;
+			String sTime;
+			sTime = Integer.toString(time.get(Calendar.MINUTE));
+			if(time.get(Calendar.MINUTE) < 10) sTime = "0" + sTime;
+			sTime = Integer.toString(time.get(Calendar.HOUR_OF_DAY)) + ":" + sTime;
+			if(time.get(Calendar.HOUR_OF_DAY) < 10) sTime = "0" + sTime;
+			return sTime;
+		}
 	}
 
 	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
@@ -348,9 +372,9 @@ delta dDateRangeGUI {
 		modifies view(int position, LinearLayout reminderRow) {
 			original(position, reminderRow);
 
-			TextView tvDateFirst = ( TextView )
+			TextView tvDateFirst = (TextView)
 			reminderRow.findViewById(R.id.txtDateFirst);
-			TextView tvDateSecond = ( TextView )
+			TextView tvDateSecond = (TextView)
 			reminderRow.findViewById(R.id.txtDateSecond);
 			tvDateFirst.setTextColor(rowColor);
 			tvDateFirst.setText(getDateFirst(position));

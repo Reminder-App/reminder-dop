@@ -13,6 +13,9 @@ delta dCreateGUI {
 		import br.unb.cic.reminders.controller.Controller;
 		import br.unb.cic.reminders.model.Reminder;
 		import br.unb.cic.reminders2.R;
+		import br.unb.cic.reminders.model.InvalidFormatException;
+		import br.unb.cic.reminders.model.InvalidDateException;
+		import br.unb.cic.reminders.model.InvalidTextException;
 
 		public class ReminderAddActivity extends Activity {
 
@@ -42,6 +45,27 @@ delta dCreateGUI {
 
 				configureActionListener();
 
+			}
+
+			private Reminder createReminder() {
+
+				Reminder reminder = new Reminder();
+				try {
+					setCreateReminder(reminder);
+				}
+				catch(InvalidTextException e) {
+					Toast.makeText(getApplicationContext(), "Invalid text.",
+						Toast.LENGTH_SHORT).show();
+				}
+				catch(InvalidDateException e) {
+					Toast.makeText(getApplicationContext(), "Invalid date.",
+						Toast.LENGTH_SHORT).show();
+				}
+				catch(InvalidHourException e) {
+					Toast.makeText(getApplicationContext(), "Invalid time.",
+						Toast.LENGTH_SHORT).show();
+				}
+				return reminder;
 			}
 
 			private void configureActionListener() {
@@ -79,7 +103,6 @@ delta dCreateGUI {
 						}
 					});
 			}
-
 
 			private void setCreateReminder(Reminder reminder) {
 				reminder.setText(edtReminder.getText().toString());
@@ -182,7 +205,8 @@ delta dCreateGUI {
 					setReminderFromIntent();
 				}
 				catch(Exception e) {
-					Intent intent2 = new Intent(getApplicationContext(), AddReminderActivity.class);
+					Intent intent2 = new Intent(getApplicationContext(),
+						AddReminderActivity.class);
 					startActivity(intent2);
 					finish();
 				}
@@ -216,7 +240,8 @@ delta dCreateGUI {
 
 				try {
 					initialize();
-				} catch (Exception e) {
+				}
+				catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -264,7 +289,7 @@ delta dCreateGUI {
 					e.printStackTrace();
 				}
 			}
-			
+
 			private void persistValues(Reminder reminder) {
 				try {
 					Controller.instance(getApplicationContext()).addReminder(reminder);

@@ -5,23 +5,17 @@ delta dFixedDateGUI {
 			
 			updateSpinnerDateHour(spinnerDate, reminder.getDate());
 			updateDateFromString(reminder.getDate());
-			updateSpinnerDateHour(spinnerTime, reminder.getHour());
-			updateTimeFromString(reminder.getHour());
 		}
 		
 		modifies reminderFromIntent(Intent intent) {
 			original(intent);
 			
 			String date = intent.getStringExtra("date");
-			String hour = intent.getStringExtra("hour");
 			reminder.setDate(date);
-			reminder.setHour(hour);
 		}
 	}
 	
 	modifies br.unb.cic.reminders.view.ReminderListFragment{
-		adds import java.util.Calendar;
-		adds import java.util.GregorianCalendar;
 		adds private ListView lvReminderNoDate;
 		
 		modifies setIntent(Reminder reminder, Intent editIntent){
@@ -45,29 +39,26 @@ delta dFixedDateGUI {
 	}
 
 	modifies br.unb.cic.reminders.view.ReminderActivity {
-		adds protected Calendar date, time;
-		adds protected Spinner spinnerDate, spinnerTime;
-		adds protected EditText edtDate, edtTime;
+		adds protected Calendar date;
+		adds protected Spinner spinnerDate;
+		adds protected EditText edtDate;
 
 		modifies initializeFields() {
 			original();
 			
 			spinnerDate = getSpinnerDate();
-			spinnerTime = getSpinnerTime();
 		}
 
 		modifies initializeListeners() {
 			original();
 			
 			addListenerToSpinnerDate();
-			addListenerToSpinnerTime();
 		}
 		
 		modifies setValuesOnReminder() {
 			original();
 			
 			reminder.setDate(dateToString());
-			reminder.setHour(timeToString());
 		}
 
 		adds private String dateToString() {
@@ -79,16 +70,6 @@ delta dFixedDateGUI {
 			if(date.get(Calendar.DAY_OF_MONTH) < 10) sDate = "0" + sDate;
 			sDate += "-" + Integer.toString(date.get(Calendar.YEAR));
 			return sDate;
-		}
-
-		adds private String timeToString() {
-			if(time == null) return null;
-			String sTime;
-			sTime = Integer.toString(time.get(Calendar.MINUTE));
-			if(time.get(Calendar.MINUTE) < 10) sTime = "0" + sTime;
-			sTime = Integer.toString(time.get(Calendar.HOUR_OF_DAY)) + ":" + sTime;
-			if(time.get(Calendar.HOUR_OF_DAY) < 10) sTime = "0" + sTime;
-			return sTime;
 		}
 
 		adds protected void updateDateFromString(String sDate) {
@@ -112,24 +93,6 @@ delta dFixedDateGUI {
 			date.set(year, month - 1, day);
 		}
 
-		adds protected void updateTimeFromString(String sTime) {
-			if(sTime == null || sTime.equals("")) {
-				time = null;
-				return;
-			}
-			char sHour [] = {
-				sTime.charAt(0), sTime.charAt(1)
-			};
-			int hour = Integer.parseInt(new String(sHour), 10);
-			char sMinute [] = {
-				sTime.charAt(3), sTime.charAt(4)
-			};
-			int minute = Integer.parseInt(new String(sMinute), 10);
-			if(time == null) time = Calendar.getInstance();
-			time.set(Calendar.MINUTE, minute);
-			time.set(Calendar.HOUR_OF_DAY, hour);
-		}
-
 		adds private Spinner getSpinnerDate() {
 			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerDate);
 
@@ -141,21 +104,6 @@ delta dFixedDateGUI {
 			items.add("+ Select");
 
 			spinner.setAdapter(adapterDateGenerator.getSpinnerAdapter(items, this));
-
-			return spinner;
-		}
-
-		adds private Spinner getSpinnerTime() {
-			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerTime);
-
-			SpinnerAdapterGenerator<String> adapterTimeGenerator = new
-			SpinnerAdapterGenerator<String>();
-
-			List<String> items = new ArrayList<String>();
-			items.add("No time");
-			items.add("+ Select");
-
-			spinner.setAdapter(adapterTimeGenerator.getSpinnerAdapter(items, this));
 
 			return spinner;
 		}
@@ -197,46 +145,6 @@ delta dFixedDateGUI {
 					}
 
 				});
-		}
-		
-		adds private void addListenerToSpinnerTime() {
-			spinnerTime.setOnTouchListener(new View.OnTouchListener() {
-					public boolean onTouch(View v, MotionEvent event) {
-						spinnerTime = getSpinnerTime();
-						return false;
-					}
-				});
-
-			spinnerTime.setOnKeyListener(new View.OnKeyListener() {
-					public boolean onKey(View v, int keyCode, KeyEvent event) {
-						spinnerTime = getSpinnerTime();
-						return false;
-					}
-				});
-
-			spinnerTime.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-					public void onItemSelected(AdapterView<? extends Object> parent, View
-						view, int pos, long id) {
-
-						switch(pos) {
-							case 0 : time = null;
-							break;
-							case 1 : if(time == null) time = Calendar.getInstance();
-							DialogFragment newFragment = new TimePickerDialogFragment(time,
-								spinnerTime);
-							newFragment.show(getFragmentManager(), "timePicker");
-							break;
-							default :
-						}
-					}
-
-					public void onNothingSelected(AdapterView<? extends Object> arg0) {
-
-					}
-
-				});
-
 		}
 	}
 
@@ -382,27 +290,15 @@ delta dFixedDateGUI {
 
 			return getItem(position).getHour();
 		}
-
-		adds private String getDatesHour(int position) {
-			if(getItem(position).getHour() == null) {
-				return "";
-			}
-
-			if(getItem(position).getHour().substring(3, 5) != "00") return
-			getItem(position).getHour().substring(0, 2) + "h" +
-			getItem(position).getHour().substring(3, 5);
-			else return getItem(position).getHour().substring(0, 2) + "h";
-		}
 	}
 
 	modifies br.unb.cic.reminders.view.ReminderAddActivity {
-		adds private EditText edtDate, edtHour;
+		adds private EditText edtDate;
 
 		modifies setCreateReminder(Reminder reminder) {
 			original(reminder);
 			
 			reminder.setDate(edtDate.getText().toString());
-			reminder.setHour(edtHour.getText().toString());
 		}
 
 		modifies existingReminderValues(Reminder reminder, Intent intent) {
@@ -410,26 +306,20 @@ delta dFixedDateGUI {
 			
 			String date = intent.getStringExtra("date");
 			reminder.setDate(date);
-
-			String hour = intent.getStringExtra("hour");
-			reminder.setHour(hour);
 		}
 		
 		modifies createReminderIntent(Intent intent, Reminder reminder) {
 			original(intent, reminder);
 			
 			String date = intent.getStringExtra("date");
-			String hour = intent.getStringExtra("hour");
 			
 			reminder.setDate(date);
-			reminder.setHour(hour);
 		}
 		
 		modifies updateFieldsFromReminder(Reminder reminder){
 			original(reminder);
 			
 			edtDate.setText(reminder.getDate());
-			edtHour.setText(reminder.getHour());
 		}
 	}
 	
@@ -438,12 +328,9 @@ delta dFixedDateGUI {
 			original(intent);
 			
 			String date = intent.getStringExtra("date");
-			String hour = intent.getStringExtra("hour");
 	
 			updateSpinnerDateHour(spinnerDate, date);
 			updateDateFromString(date);
-			updateSpinnerDateHour(spinnerTime, hour);
-			updateTimeFromString(hour);
 		}
 	}
 }

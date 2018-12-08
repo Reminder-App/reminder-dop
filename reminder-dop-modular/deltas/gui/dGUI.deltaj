@@ -56,6 +56,23 @@ delta dGUI {
 				addListenerToBtnCancel();
 			}
 
+			@SuppressWarnings("unchecked")
+			protected void updateSpinnerDateHour(Spinner spinner, String dateOrHour) {
+				if(dateOrHour == null) return;
+
+				ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
+				spinner.getAdapter();
+
+				int count = adapter.getCount();
+				if(count > 2) {
+					for(int i = 2;
+						i < count;
+						++ i) adapter.remove(adapter.getItem(i));
+				}
+				adapter.add(dateOrHour);
+				spinner.setSelection(2);
+			}
+
 			protected abstract void initializeValues();
 
 			private void addListenerToBtnSave() {
@@ -142,13 +159,7 @@ delta dGUI {
 
 			private int rowColor = Color.BLACK;
 
-			private int rowType = NEXT_DAYS;
-
 			private TextView tvReminder;
-
-			public static final int LATE = 0;
-			public static final int TODAY = 1;
-			public static final int NEXT_DAYS = 2;
 
 			public ReminderArrayAdapter(Context context, List<Reminder> objects) {
 				super(context, R.layout.reminder_row, objects);
@@ -188,7 +199,7 @@ delta dGUI {
 			}
 
 			private void view(int position, LinearLayout reminderRow) {
-				tvReminder = (TextView)reminderRow.findViewById(R.id.txtReminder);
+				tvReminder = ( TextView ) reminderRow.findViewById(R.id.txtReminder);
 				tvReminder.setTextColor(rowColor);
 				tvReminder.setText(getItem(position).getText());
 			}
@@ -337,8 +348,9 @@ delta dGUI {
 					contextMenuAdapter.getItem(info.position);
 
 					switch(item.getItemId()) {
-						case R.id.edit :
-						Intent editIntent = new Intent(getActivity().getApplicationContext(), EditReminderActivity.class);
+						case R.id.edit : Intent editIntent = new
+						Intent(getActivity().getApplicationContext(),
+							EditReminderActivity.class);
 						setIntent(reminder, editIntent);
 						startActivity(editIntent);
 						updateListView(null);

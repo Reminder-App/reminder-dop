@@ -4,50 +4,19 @@ delta dDateRangeFixedDateGUI {
 		adds import java.util.GregorianCalendar;
 	}
 
+	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
+		adds private int rowType = NEXT_DAYS;
+		adds public static final int LATE = 0;
+		adds public static final int TODAY = 1;
+		adds public static final int NEXT_DAYS = 2;
+	}
+
 	modifies br.unb.cic.reminders.view.ReminderActivity {
 		modifies initializeListeners() {
 			original();
 
 			addListenerToSpinnerDate();
 			addListenerToSpinnerTime();
-		}
-
-		adds private String dateToString(Calendar date) {
-			if(date == null) return null;
-			String sDate;
-			sDate = Integer.toString(date.get(Calendar.MONTH) + 1);
-			if(date.get(Calendar.MONTH) + 1 < 10) sDate = "0" + sDate;
-			sDate = Integer.toString(date.get(Calendar.DAY_OF_MONTH)) + "-" + sDate;
-			if(date.get(Calendar.DAY_OF_MONTH) < 10) sDate = "0" + sDate;
-			sDate += "-" + Integer.toString(date.get(Calendar.YEAR));
-			return sDate;
-		}
-
-		adds private String timeToString(Calendar time) {
-			if(time == null) return null;
-			String sTime;
-			sTime = Integer.toString(time.get(Calendar.MINUTE));
-			if(time.get(Calendar.MINUTE) < 10) sTime = "0" + sTime;
-			sTime = Integer.toString(time.get(Calendar.HOUR_OF_DAY)) + ":" + sTime;
-			if(time.get(Calendar.HOUR_OF_DAY) < 10) sTime = "0" + sTime;
-			return sTime;
-		}
-
-		adds @SuppressWarnings("unchecked")
-		protected void updateSpinnerDateHour(Spinner spinner, String dateOrHour) {
-			if(dateOrHour == null) return;
-
-			ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
-			spinner.getAdapter();
-
-			int count = adapter.getCount();
-			if(count > 2) {
-				for(int i = 2;
-					i < count;
-					++ i) adapter.remove(adapter.getItem(i));
-			}
-			adapter.add(dateOrHour);
-			spinner.setSelection(2);
 		}
 	}
 
