@@ -1,0 +1,27 @@
+//#ifdef view
+delta dViewGUI {
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderListFragment {
+		adds private ListView lvReminderLate, lvReminderToday, lvReminderNextDays;
+
+		adds public void createUI() {
+			createListView();
+			updateListView(null);
+			valuesForRegister();
+		}
+
+		adds private void valuesForRegister() {
+			registerForContextMenu(lvReminderLate);
+			registerForContextMenu(lvReminderToday);
+			registerForContextMenu(lvReminderNextDays);
+		}
+
+		adds private void createListView() {
+			lvReminderLate = ( ListView ) view.findViewById(R.id.lvRemindersLate);
+			lvReminderToday = ( ListView ) view.findViewById(R.id.lvRemindersToday);
+			lvReminderNextDays = ( ListView ) view.findViewById(R.id.lvRemindersNextDays);
+		}
+	}
+	//#endif
+}
+//#endif

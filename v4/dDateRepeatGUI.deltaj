@@ -1,0 +1,280 @@
+//#ifdef dateRepeat
+delta dDateRepeatGUI {
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ReminderAddActivity {
+		adds import br.unb.cic.reminders.model.InvalidDaysException;
+		adds import android.widget.CheckBox;
+		adds private CheckBox cbMonday, cbTuesday, cbWednesday, cbThursday, cbFriday,
+		cbSaturday, cbSunday;
+
+		modifies setCreateReminder(Reminder reminder) {
+			original(reminder);
+
+			reminder.setMonday(cbMonday.isChecked());
+			reminder.setTuesday(cbTuesday.isChecked());
+			reminder.setWednesday(cbWednesday.isChecked());
+			reminder.setThursday(cbThursday.isChecked());
+			reminder.setFriday(cbFriday.isChecked());
+			reminder.setSaturday(cbSaturday.isChecked());
+			try {
+				reminder.setSunday(cbSunday.isChecked());
+			}
+			catch(InvalidDaysException e) {
+				Toast.makeText(getApplicationContext(),
+					"At least one day should be checked.", Toast.LENGTH_SHORT).show();
+			}
+			reminder.setHour(edtHour.getText().toString());
+		}
+
+		modifies existingReminderValues(Reminder reminder, Intent intent) {
+			original(reminder, intent);
+
+			boolean monday = intent.getBooleanExtra("monday", false);
+			boolean tuesday = intent.getBooleanExtra("tuesday", false);
+			boolean wednesday = intent.getBooleanExtra("wednesday", false);
+			boolean thursday = intent.getBooleanExtra("thursday", false);
+			boolean friday = intent.getBooleanExtra("friday", false);
+			boolean saturday = intent.getBooleanExtra("saturday", false);
+			boolean sunday = intent.getBooleanExtra("sunday", false);
+			String hour = intent.getStringExtra("hour");
+
+			reminder.setMonday(monday);
+			reminder.setTuesday(tuesday);
+			reminder.setWednesday(wednesday);
+			reminder.setThursday(thursday);
+			reminder.setFriday(friday);
+			reminder.setSaturday(saturday);
+			reminder.setSunday(sunday);
+			reminder.setHour(hour);
+		}
+
+		modifies createReminderIntent(Intent intent, Reminder reminder) {
+			original(intent, reminder);
+
+			boolean monday = intent.getBooleanExtra("monday", false);
+			boolean tuesday = intent.getBooleanExtra("tuesday", false);
+			boolean wednesday = intent.getBooleanExtra("wednesday", false);
+			boolean thursday = intent.getBooleanExtra("thursday", false);
+			boolean friday = intent.getBooleanExtra("friday", false);
+			boolean saturday = intent.getBooleanExtra("saturday", false);
+			boolean sunday = intent.getBooleanExtra("sunday", false);
+			String hour = intent.getStringExtra("hour");
+
+			reminder.setMonday(monday);
+			reminder.setTuesday(tuesday);
+			reminder.setWednesday(wednesday);
+			reminder.setThursday(thursday);
+			reminder.setFriday(friday);
+			reminder.setSaturday(saturday);
+			reminder.setSunday(sunday);
+			reminder.setHour(hour);
+		}
+
+		modifies updateFieldsFromReminder(Reminder reminder) {
+			original(reminder);
+
+			edtReminder.setText(reminder.getText());
+			edtDetails.setText(reminder.getDetails());
+			cbMonday.setChecked(reminder.isMonday());
+			cbTuesday.setChecked(reminder.isTuesday());
+			cbWednesday.setChecked(reminder.isWednesday());
+			cbThursday.setChecked(reminder.isThursday());
+			cbFriday.setChecked(reminder.isFriday());
+			cbSaturday.setChecked(reminder.isSaturday());
+			cbSunday.setChecked(reminder.isSunday());
+			edtHour.setText(reminder.getHour());
+		}
+	}
+	//#endif
+
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
+		removes import java.util.Calendar;
+		removes import java.util.GregorianCalendar;
+		
+		adds private int rowType = MONDAY;
+		adds public static final int MONDAY = 0;
+		adds public static final int TUESDAY = 1;
+		adds public static final int WEDNESDAY = 2;
+		adds public static final int THURSDAY = 3;
+		adds public static final int FRIDAY = 4;
+		adds public static final int SATURDAY = 5;
+		adds public static final int SUNDAY = 6;
+		
+		removes ReminderArrayAdapter(Context context, List<Reminder> objects);
+		adds public ReminderArrayAdapter(Context context, List<Reminder> objects) {
+			super(context, R.layout.reminder_row, objects);
+			this.context = context;
+
+			this.rowColor = Color.BLACK;
+			this.rowType = MONDAY;
+		}
+
+		modifies view(int position, LinearLayout reminderRow) {
+			original(position, reminderRow);
+			
+			TextView tvHour = (TextView) reminderRow.findViewById(R.id.txtHour);
+			tvHour.setTextColor(rowColor);
+			tvHour.setText(getDatesHour(position));
+		}
+	}
+
+	modifies br.unb.cic.reminders.view.ReminderListFragment {
+		adds private ListView lvMonday, lvTuesday, lvWednesday, lvThursday, lvFriday,
+		lvSaturday, lvSunday;
+		
+		removes lvReminderLate;
+		removes lvReminderToday;
+		removes lvReminderNextDays;
+
+		modifies setIntent(Reminder reminder, Intent editIntent) {
+			original(reminder, editIntent);
+
+			editIntent.putExtra("monday", reminder.isMonday());
+			editIntent.putExtra("tuesday", reminder.isTuesday());
+			editIntent.putExtra("wednesday", reminder.isWednesday());
+			editIntent.putExtra("thursday", reminder.isThursday());
+			editIntent.putExtra("friday", reminder.isFriday());
+			editIntent.putExtra("saturday", reminder.isSaturday());
+			editIntent.putExtra("sunday", reminder.isSunday());
+			editIntent.putExtra("hour", reminder.getHour());
+		}
+
+		modifies createListView() {
+			lvMonday = (ListView) view.findViewById(R.id.lvMonday);
+			lvTuesday = (ListView) view.findViewById(R.id.lvTuesday);
+			lvWednesday = (ListView) view.findViewById(R.id.lvWednesday);
+			lvThursday = (ListView) view.findViewById(R.id.lvThursday);
+			lvFriday = (ListView) view.findViewById(R.id.lvFriday);
+			lvSaturday = (ListView) view.findViewById(R.id.lvSaturday);
+			lvSunday = (ListView) view.findViewById(R.id.lvSunday);			
+		}
+		
+		modifies valuesForRegister(){
+			registerForContextMenu(lvMonday);
+			registerForContextMenu(lvTuesday);
+			registerForContextMenu(lvWednesday);
+			registerForContextMenu(lvThursday);
+			registerForContextMenu(lvFriday);
+			registerForContextMenu(lvSaturday);
+			registerForContextMenu(lvSunday);
+		}
+	}
+	//#endif
+
+	//#ifdef edit
+	modifies br.unb.cic.reminders.view.EditReminderActivity {
+		modifies setInitializeValues(Intent intent) {
+			original(intent);
+
+			boolean monday = intent.getBooleanExtra("monday", false);
+			boolean tuesday = intent.getBooleanExtra("tuesday", false);
+			boolean wednesday = intent.getBooleanExtra("wednesday", false);
+			boolean thursday = intent.getBooleanExtra("thursday", false);
+			boolean friday = intent.getBooleanExtra("friday", false);
+			boolean saturday = intent.getBooleanExtra("saturday", false);
+			boolean sunday = intent.getBooleanExtra("sunday", false);
+			String hour = intent.getStringExtra("hour");
+
+			reminder.setMonday(monday);
+			reminder.setTuesday(tuesday);
+			reminder.setWednesday(wednesday);
+			reminder.setThursday(thursday);
+			reminder.setFriday(friday);
+			reminder.setSaturday(saturday);
+			reminder.setSunday(sunday);
+
+			cbMonday.setChecked(monday);
+			cbTuesday.setChecked(tuesday);
+			cbWednesday.setChecked(wednesday);
+			cbThursday.setChecked(thursday);
+			cbFriday.setChecked(friday);
+			cbSaturday.setChecked(saturday);
+			cbSunday.setChecked(sunday);
+
+			updateSpinnerDateHour(spinnerTime, hour);
+			updateTimeFromString(hour);
+		}
+	}
+	//#endif
+	
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ExternalAddReminderActivity {
+		modifies reminderFromIntent(Intent intent) {
+			original(intent);
+
+			String hour = intent.getStringExtra("hour");
+			int monday = intent.getIntExtra("monday", 0);
+			int tuesday = intent.getIntExtra("tuesday", 0);
+			int wednesday = intent.getIntExtra("wednesday", 0);
+			int thursday = intent.getIntExtra("thursday", 0);
+			int friday = intent.getIntExtra("friday", 0);
+			int saturday = intent.getIntExtra("saturday", 0);
+			int sunday = intent.getIntExtra("sunday", 0);
+			reminder.setMonday(monday);
+			reminder.setTuesday(tuesday);
+			reminder.setWednesday(wednesday);
+			reminder.setThursday(thursday);
+			reminder.setFriday(friday);
+			reminder.setSaturday(saturday);
+			reminder.setSunday(sunday);
+			reminder.setHour(hour);
+		}
+
+		modifies initialize() {
+			original();
+
+			updateSpinnerDateHour(spinnerTime, reminder.getHour());
+			updateTimeFromString(reminder.getHour());
+		}
+	}
+	//#endif
+	
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderActivity {
+		adds import br.unb.cic.reminders.model.InvalidDaysException;
+		adds import android.widget.CheckBox;
+		adds protected CheckBox cbMonday, cbTuesday, cbWednesday, cbThursday,
+		cbFriday, cbSaturday, cbSunday;
+
+		modifies initializeFields() {
+			original();
+
+			cbMonday = (CheckBox) findViewById(R.id.cbMonday);
+			cbTuesday = (CheckBox) findViewById(R.id.cbTuesday);
+			cbWednesday = (CheckBox) findViewById(R.id.cbWednesday);
+			cbThursday = (CheckBox) findViewById(R.id.cbThursday);
+			cbFriday = (CheckBox) findViewById(R.id.cbFriday);
+			cbSaturday = (CheckBox) findViewById(R.id.cbSaturday);
+			cbSunday = (CheckBox) findViewById(R.id.cbSunday);
+			spinnerTime = getSpinnerTime();
+		}
+
+		modifies setValuesOnReminder() {
+			original();
+
+			reminder.setMonday(cbMonday.isChecked());
+			reminder.setTuesday(cbTuesday.isChecked());
+			reminder.setWednesday(cbWednesday.isChecked());
+			reminder.setThursday(cbThursday.isChecked());
+			reminder.setFriday(cbFriday.isChecked());
+			reminder.setSaturday(cbSaturday.isChecked());
+			try {
+				reminder.setSunday(cbSunday.isChecked());
+			}
+			catch(InvalidDaysException e) {
+				Toast.makeText(getApplicationContext(),
+					"At least one day should be checked.", Toast.LENGTH_SHORT).show();
+			}
+			reminder.setHour(timeToString());
+		}
+
+		modifies initializeListeners() {
+			original();
+
+			addListenerToSpinnerTime();
+		}
+	}
+	//#endif
+}
+//#endif

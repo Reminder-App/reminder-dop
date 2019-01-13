@@ -1,0 +1,76 @@
+//#ifdef priority
+delta dPriorityModel {
+	adds {
+		package br.unb.cic.reminders.model;
+
+		public enum Priority {
+
+			LOW(0, "No Priority"), NORMAL(1, "Important"), HIGH(2, "Urgent");
+
+			int code;
+			String description;
+
+			private Priority(int code, String description) {
+				this.code = code;
+				this.description = description;
+			}
+
+			public int getCode() {
+				return code;
+			}
+
+			static public Priority fromCode(int code) {
+				for(Priority p : Priority.values()) {
+					if(p.getCode() == code) {
+						return p;
+					}
+				}
+				throw new IllegalArgumentException();
+			}
+
+			@Override
+			public String toString() {
+				return description;
+			}
+
+		}
+	}
+
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.model.db.DBConstants {
+		modifies tableStatement() {
+			return original() + "PRIORITY INTEGER NOT NULL,";
+		}
+
+		adds public static String REMINDER_PRIORITY_COLUMN = "PRIORITY";
+	}
+
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		adds import br.unb.cic.reminders.model.Priority;
+
+		modifies valuesCursorToReminder(Cursor cursor, Reminder reminder) {
+			original(cursor, reminder);
+
+			int priority =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_PRIORITY_COLUMN));
+			reminder.setPriority(Priority.fromCode(priority));
+		}
+	}
+	
+	modifies br.unb.cic.reminders.model.Reminder {
+		adds @Column(column = "PRIORITY", type = DBTypes.INT) private Priority priority;
+		
+		modifies isValid() {
+			return original() && (priority != null);
+		}
+		
+		adds public int getPriority() {
+			return priority.getCode();
+		}
+		adds public void setPriority(Priority priority) {
+			this.priority = priority;
+		}
+	}
+	//#endif
+}
+//#endif

@@ -1,0 +1,38 @@
+//#ifdef googleCalendar
+delta dGoogleCalendarGUI {
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderActivity {
+		adds import br.unb.cic.reminders.calendar.CalendarEventCreator;
+		adds import br.unb.cic.reminders.model.CalendarNotFoundException;
+		adds import android.widget.CheckBox;
+		adds import java.text.ParseException;
+
+		adds private CalendarEventCreator creator;
+		adds private CheckBox cbCalendar;
+
+		modifies initializeFields() {
+			original();
+
+			cbCalendar = (CheckBox) findViewById(R.id.cbCalendar);
+		}
+
+		modifies setValuesOnReminder() {
+			original();
+
+			if(cbCalendar.isChecked()) {
+				creator = new CalendarEventCreator();
+				try {
+					creator.addEventCalendar(reminder, getApplicationContext());
+				}
+				catch(CalendarNotFoundException e) {
+					e.printStackTrace();
+				}
+				catch(ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	//#endif
+}
+//#endif

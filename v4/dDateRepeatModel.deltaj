@@ -1,0 +1,216 @@
+//#ifdef dateRepeat
+delta dDateRepeatModel {
+	adds {
+		package br.unb.cic.reminders.model;
+
+		public class InvalidDaysException extends InvalidFormatException {
+
+			private static final long serialVersionUID = 7998188562654167391L;
+
+			public InvalidDaysException(Object o) {
+				super("These days " + o);
+			}
+		}
+	}
+	
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.model.Reminder {
+		adds @Column(column = "MONDAY", type = DBTypes.INT)
+		private boolean monday;
+
+		adds @Column(column = "TUESDAY", type = DBTypes.INT)
+		private boolean tuesday;
+
+		adds @Column(column = "WEDNESDAY", type = DBTypes.INT)
+		private boolean wednesday;
+
+		adds @Column(column = "THURSDAY", type = DBTypes.INT)
+		private boolean thursday;
+
+		adds @Column(column = "FRIDAY", type = DBTypes.INT)
+		private boolean friday;
+
+		adds @Column(column = "SATURDAY", type = DBTypes.INT)
+		private boolean saturday;
+
+		adds @Column(column = "SUNDAY", type = DBTypes.INT)
+		private boolean sunday;
+
+		adds public boolean isOneCbSelected() {
+			return(monday != false || tuesday != false || wednesday != false || thursday
+				!= false || friday != false || saturday != false);
+		}
+
+		adds public boolean isMonday() {
+			return monday;
+		}
+
+		adds public void setMonday(boolean monday) {
+			this.monday = monday;
+		}
+
+		adds public void setMonday(int monday) {
+			this.monday =(monday == 0 ? false : true);
+		}
+
+		adds public int getMonday() {
+			return monday ? 1 : 0;
+		}
+
+		adds public boolean isTuesday() {
+			return tuesday;
+		}
+
+		adds public void setTuesday(boolean tuesday) {
+			this.tuesday = tuesday;
+		}
+
+		adds public void setTuesday(int tuesday) {
+			this.tuesday =(tuesday == 0 ? false : true);
+		}
+
+		adds public int getTuesday() {
+			return tuesday ? 1 : 0;
+		}
+
+		adds public boolean isWednesday() {
+			return wednesday;
+		}
+
+		adds public void setWednesday(boolean wednesday) {
+			this.wednesday = wednesday;
+		}
+
+		adds public void setWednesday(int wednesday) {
+			this.wednesday =(wednesday == 0 ? false : true);
+		}
+
+		adds public int getWednesday() {
+			return wednesday ? 1 : 0;
+		}
+
+		adds public boolean isThursday() {
+			return thursday;
+		}
+
+		adds public void setThursday(boolean thursday) {
+			this.thursday = thursday;
+		}
+
+		adds public void setThursday(int thursday) {
+			this.thursday =(thursday == 0 ? false : true);
+		}
+
+		adds public int getThursday() {
+			return thursday ? 1 : 0;
+		}
+
+		adds public boolean isFriday() {
+			return friday;
+		}
+
+		adds public void setFriday(boolean friday) {
+			this.friday = friday;
+		}
+
+		adds public void setFriday(int friday) {
+			this.friday =(friday == 0 ? false : true);
+		}
+
+		adds public int getFriday() {
+			return friday ? 1 : 0;
+		}
+
+		adds public boolean isSaturday() {
+			return saturday;
+		}
+
+		adds public void setSaturday(boolean saturday) {
+			this.saturday = saturday;
+		}
+
+		adds public void setSaturday(int saturday) {
+			this.saturday =(saturday == 0 ? false : true);
+		}
+
+		adds public int getSaturday() {
+			return saturday ? 1 : 0;
+		}
+
+		adds public boolean isSunday() {
+			return sunday;
+		}
+
+		adds public void setSunday(boolean sunday) {
+			if(! isOneCbSelected() && ! sunday) {
+				throw new InvalidDaysException("are all false");
+			}
+			this.sunday = sunday;
+		}
+
+		adds public void setSunday(int sunday) {
+			this.sunday =(sunday == 0 ? false : true);
+		}
+
+		adds public int getSunday() {
+			return sunday ? 1 : 0;
+		}
+
+		modifies isValid() {
+			return original() && isOneCbSelected();
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.db.DBConstants {
+		adds public static String REMINDER_MONDAY_COLUMN = "MONDAY";
+		adds public static String REMINDER_TUESDAY_COLUMN = "TUESDAY";
+		adds public static String REMINDER_WEDNESDAY_COLUMN = "WEDNESDAY";
+		adds public static String REMINDER_THURSDAY_COLUMN = "THURSDAY";
+		adds public static String REMINDER_FRIDAY_COLUMN = "FRIDAY";
+		adds public static String REMINDER_SATURDAY_COLUMN = "SATURDAY";
+		adds public static String REMINDER_SUNDAY_COLUMN = "SUNDAY";
+
+		modifies tableStatement() {
+			return original() + "MONDAY INTEGER NOT NULL," + "TUESDAY INTEGER NOT NULL,"
+			+ "WEDNESDAY INTEGER NOT NULL," + "THURSDAY INTEGER NOT NULL," +
+			"FRIDAY INTEGER NOT NULL," + "SATURDAY INTEGER NOT NULL," +
+			"SUNDAY INTEGER NOT NULL,";
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		modifies valuesCursorToReminder(Cursor cursor, Reminder reminder) {
+			original(cursor, reminder);
+
+			int monday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_MONDAY_COLUMN));
+			reminder.setMonday(monday);
+
+			int tuesday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_TUESDAY_COLUMN));
+			reminder.setTuesday(tuesday);
+
+			int wednesday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_WEDNESDAY_COLUMN));
+			reminder.setWednesday(wednesday);
+
+			int thursday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_THURSDAY_COLUMN));
+			reminder.setThursday(thursday);
+
+			int friday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_FRIDAY_COLUMN));
+			reminder.setFriday(friday);
+
+			int saturday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_SATURDAY_COLUMN));
+			reminder.setSaturday(saturday);
+
+			int sunday =
+			cursor.getInt(cursor.getColumnIndex(DBConstants.REMINDER_SUNDAY_COLUMN));
+			reminder.setSunday(sunday);
+		}
+	}
+	//#endif
+}
+//#endif

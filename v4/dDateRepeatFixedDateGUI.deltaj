@@ -1,0 +1,193 @@
+//#if dateRepeat || fixedDate
+delta dDateRepeatFixedDateGUI {
+	//#ifdef edit
+	modifies br.unb.cic.reminders.view.EditReminderActivity {
+		modifies setInitializeValues(Intent intent) {
+			original(intent);
+
+			String hour = intent.getStringExtra("hour");
+
+			updateSpinnerDateHour(spinnerTime, hour);
+			updateTimeFromString(hour);
+		}
+	}
+	//#endif
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ReminderAddActivity {
+		adds private EditText edtHour;
+
+		modifies setCreateReminder(Reminder reminder) {
+			original(reminder);
+
+			reminder.setHour(edtHour.getText().toString());
+		}
+
+		modifies existingReminderValues(Reminder reminder, Intent intent) {
+			original(reminder, intent);
+
+			String hour = intent.getStringExtra("hour");
+			reminder.setHour(hour);
+		}
+
+		modifies createReminderIntent(Intent intent, Reminder reminder) {
+			original(intent, reminder);
+
+			String hour = intent.getStringExtra("hour");
+
+			reminder.setHour(hour);
+		}
+
+		modifies updateFieldsFromReminder(Reminder reminder) {
+			original(reminder);
+
+			edtHour.setText(reminder.getHour());
+		}
+	}
+	//#endif
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
+		adds private String getDatesHour(int position) {
+			if(getItem(position).getHour() == null) {
+				return "";
+			}
+
+			if(getItem(position).getHour().substring(3, 5) != "00") return
+			getItem(position).getHour().substring(0, 2) + "h" +
+			getItem(position).getHour().substring(3, 5);
+			else return getItem(position).getHour().substring(0, 2) + "h";
+		}
+	}
+
+	modifies br.unb.cic.reminders.view.ReminderActivity {
+		adds protected Calendar time;
+		adds protected Spinner spinnerTime;
+		adds protected EditText edtTime;
+
+		modifies initializeFields() {
+			original();
+
+			spinnerTime = getSpinnerTime();
+		}
+
+		modifies initializeListeners() {
+			original();
+
+			addListenerToSpinnerTime();
+		}
+
+		modifies setValuesOnReminder() {
+			original();
+
+			reminder.setHour(timeToString());
+		}
+
+		adds private String timeToString() {
+			if(time == null) return null;
+			String sTime;
+			sTime = Integer.toString(time.get(Calendar.MINUTE));
+			if(time.get(Calendar.MINUTE) < 10) sTime = "0" + sTime;
+			sTime = Integer.toString(time.get(Calendar.HOUR_OF_DAY)) + ":" + sTime;
+			if(time.get(Calendar.HOUR_OF_DAY) < 10) sTime = "0" + sTime;
+			return sTime;
+		}
+
+		adds protected void updateTimeFromString(String sTime) {
+			if(sTime == null || sTime.equals("")) {
+				time = null;
+				return;
+			}
+			char sHour [] = {
+				sTime.charAt(0), sTime.charAt(1)
+			};
+			int hour = Integer.parseInt(new String(sHour), 10);
+			char sMinute [] = {
+				sTime.charAt(3), sTime.charAt(4)
+			};
+			int minute = Integer.parseInt(new String(sMinute), 10);
+			if(time == null) time = Calendar.getInstance();
+			time.set(Calendar.MINUTE, minute);
+			time.set(Calendar.HOUR_OF_DAY, hour);
+		}
+
+		adds private Spinner getSpinnerTime() {
+			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerTime);
+
+			SpinnerAdapterGenerator<String> adapterTimeGenerator = new
+			SpinnerAdapterGenerator<String>();
+
+			List<String> items = new ArrayList<String>();
+			items.add("No time");
+			items.add("+ Select");
+
+			spinner.setAdapter(adapterTimeGenerator.getSpinnerAdapter(items, this));
+
+			return spinner;
+		}
+
+		adds private void addListenerToSpinnerTime() {
+			spinnerTime.setOnTouchListener(new View.OnTouchListener() {
+					public boolean onTouch(View v, MotionEvent event) {
+						spinnerTime = getSpinnerTime();
+						return false;
+					}
+				});
+
+			spinnerTime.setOnKeyListener(new View.OnKeyListener() {
+					public boolean onKey(View v, int keyCode, KeyEvent event) {
+						spinnerTime = getSpinnerTime();
+						return false;
+					}
+				});
+
+			spinnerTime.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+					public void onItemSelected(AdapterView<? extends Object> parent, View
+						view, int pos, long id) {
+
+						switch(pos) {
+							case 0 : time = null;
+							break;
+							case 1 : if(time == null) time = Calendar.getInstance();
+							DialogFragment newFragment = new TimePickerDialogFragment(time,
+								spinnerTime);
+							newFragment.show(getFragmentManager(), "timePicker");
+							break;
+							default :
+						}
+					}
+
+					public void onNothingSelected(AdapterView<? extends Object> arg0) {
+
+					}
+
+				});
+		}
+	}
+	
+	modifies br.unb.cic.reminders.view.ReminderListFragment{
+		modifies setIntent(Reminder reminder, Intent editIntent){
+			original(reminder, editIntent);
+
+			editIntent.putExtra("hour", reminder.getHour());
+		}
+	}
+	//#endif
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ExternalAddReminderActivity {
+		modifies initialize() {
+			original();
+			
+			updateSpinnerDateHour(spinnerTime, reminder.getHour());
+			updateTimeFromString(reminder.getHour());
+		}
+		
+		modifies reminderFromIntent(Intent intent) {
+			original(intent);
+			
+			String hour = intent.getStringExtra("hour");
+			reminder.setHour(hour);
+		}
+	}
+	//#endif
+}
+//#endif

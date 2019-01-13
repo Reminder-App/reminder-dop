@@ -1,0 +1,480 @@
+//#ifdef reminder
+delta dGUI {
+	//#ifdef gui
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.ArrayList;
+		import java.util.Calendar;
+		import java.util.List;
+
+		import android.app.Activity;
+		import android.app.DialogFragment;
+		import android.os.Bundle;
+		import android.util.Log;
+		import android.view.KeyEvent;
+		import android.view.MotionEvent;
+		import android.view.View;
+		import android.widget.AdapterView;
+		import android.widget.AdapterView.OnItemSelectedListener;
+		import android.widget.ArrayAdapter;
+		import android.widget.Button;
+		import android.widget.EditText;
+		import android.widget.Spinner;
+		import android.widget.Toast;
+		import br.unb.cic.reminders.model.InvalidDateException;
+		import br.unb.cic.reminders.model.InvalidTextException;
+		import br.unb.cic.reminders.model.Reminder;
+		import br.unb.cic.reminders2.R;
+
+		public abstract class ReminderActivity extends Activity {
+
+			protected Reminder reminder;
+
+			protected EditText edtReminder, edtDetails;
+
+			private Button btnSave, btnCancel;
+
+			@Override
+			protected void onCreate(Bundle savedInstanceState) {
+				super.onCreate(savedInstanceState);
+				setContentView(R.layout.reminder_add);
+
+				if(reminder == null) reminder = new Reminder();
+				initializeFields();
+				initializeListeners();
+				initializeValues();
+			}
+
+			private void initializeFields() {
+				btnSave = ( Button ) findViewById(R.id.btnSave);
+				btnCancel = ( Button ) findViewById(R.id.btnCancel);
+				edtReminder = ( EditText ) findViewById(R.id.edtReminder);
+				edtDetails = ( EditText ) findViewById(R.id.edtDetails);
+			}
+
+			private void initializeListeners() {
+				addListenerToBtnSave();
+				addListenerToBtnCancel();
+			}
+
+			@SuppressWarnings("unchecked")
+			protected void updateSpinnerDateHour(Spinner spinner, String dateOrHour) {
+				if(dateOrHour == null) return;
+
+				ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
+				spinner.getAdapter();
+
+				int count = adapter.getCount();
+				if(count > 2) {
+					for(int i = 2;
+						i < count;
+						++ i) adapter.remove(adapter.getItem(i));
+				}
+				adapter.add(dateOrHour);
+				spinner.setSelection(2);
+			}
+
+			protected abstract void initializeValues();
+
+			private void addListenerToBtnSave() {
+				btnSave.setOnClickListener(new Button.OnClickListener() {
+						public void onClick(View v) {
+							try {
+								createReminder();
+								persist(reminder);
+								finish();
+							}
+							catch(Exception e) {
+								Log.e("ReminderActivity", e.getMessage());
+								e.printStackTrace();
+							}
+						}
+
+					});
+			}
+
+			private void addListenerToBtnCancel() {
+				btnCancel.setOnClickListener(new Button.OnClickListener() {
+						public void onClick(View v) {
+							finish();
+						}
+					});
+			}
+
+			protected abstract void persist(Reminder reminder);
+
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import br.unb.cic.reminders.controller.ReminderFilter;
+
+		public interface FiltersListChangeListener {
+
+			public void onSelectedFilterChanged(ReminderFilter filter);
+
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import br.unb.cic.reminders.model.InvalidFormatException;
+
+		public class InvalidHourException extends InvalidFormatException {
+			private static final long serialVersionUID = 8341230773647025695L;
+
+			public InvalidHourException(Object o) {
+				super("This hour " + o);
+			}
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.Calendar;
+		import java.util.GregorianCalendar;
+		import java.util.List;
+
+		import android.content.Context;
+		import android.graphics.Color;
+		import android.view.LayoutInflater;
+		import android.view.View;
+		import android.view.ViewGroup;
+		import android.widget.ArrayAdapter;
+		import android.widget.CheckBox;
+		import android.widget.CompoundButton;
+		import android.widget.LinearLayout;
+		import android.widget.TextView;
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.reminders.controller.Controller;
+		import br.unb.cic.reminders.model.Reminder;
+		import br.unb.cic.reminders2.R;
+
+		public class ReminderArrayAdapter extends ArrayAdapter<Reminder> {
+
+			private Context context;
+
+			private int rowColor = Color.BLACK;
+
+			private TextView tvReminder;
+
+			public ReminderArrayAdapter(Context context, List<Reminder> objects) {
+				super(context, R.layout.reminder_row, objects);
+				this.context = context;
+
+				this.rowColor = Color.BLACK;
+				this.rowType = NEXT_DAYS;
+			}
+
+			public ReminderArrayAdapter(Context context, List<Reminder> objects, int
+				rowColor, int rowType) {
+				super(context, R.layout.reminder_row, objects);
+				this.context = context;
+
+				this.rowColor = rowColor;
+				this.rowType = rowType;
+			}
+
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				LinearLayout reminderRow;
+
+				if(convertView == null) {
+					reminderRow = new LinearLayout(getContext());
+					String inflater = Context.LAYOUT_INFLATER_SERVICE;
+					LayoutInflater vi;
+					vi = ( LayoutInflater ) getContext().getSystemService(inflater);
+					vi.inflate(R.layout.reminder_row, reminderRow, true);
+				}
+				else {
+					reminderRow = ( LinearLayout ) convertView;
+				}
+
+				view(position, reminderRow);
+
+				return reminderRow;
+			}
+
+			private void view(int position, LinearLayout reminderRow) {
+				tvReminder = ( TextView ) reminderRow.findViewById(R.id.txtReminder);
+				tvReminder.setTextColor(rowColor);
+				tvReminder.setText(getItem(position).getText());
+			}
+
+			public int getRowColor() {
+				return rowColor;
+			}
+
+			public void setRowColor(int rowColor) {
+				this.rowColor = rowColor;
+			}
+
+			public int getRowType() {
+				return rowType;
+			}
+
+			public void setRowType(int rowType) {
+				this.rowType = rowType;
+			}
+
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.List;
+
+		import android.content.Context;
+		import android.view.LayoutInflater;
+		import android.view.View;
+		import android.view.ViewGroup;
+		import android.widget.ArrayAdapter;
+		import android.widget.LinearLayout;
+		import android.widget.TextView;
+		import br.unb.cic.reminders.controller.ReminderFilter;
+		import br.unb.cic.reminders2.R;
+
+		public class ReminderFilterArrayAdapter extends ArrayAdapter<ReminderFilter>
+		{
+
+			public ReminderFilterArrayAdapter(Context context, List<ReminderFilter>
+				objects) {
+				super(context, R.layout.reminder_row, objects);
+			}
+
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				LinearLayout filterRow;
+
+				if(convertView == null) {
+					filterRow = new LinearLayout(getContext());
+					String inflater = Context.LAYOUT_INFLATER_SERVICE;
+					LayoutInflater vi;
+					vi = ( LayoutInflater ) getContext().getSystemService(inflater);
+					vi.inflate(R.layout.reminder_row, filterRow, true);
+				}
+				else {
+					filterRow = ( LinearLayout ) convertView;
+				}
+
+				TextView tvReminder = ( TextView )
+				filterRow.findViewById(R.id.txtReminder);
+				tvReminder.setText(getItem(position).getName());
+
+				return filterRow;
+			}
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.ArrayList;
+		import java.util.List;
+
+		import util.Utility;
+		import android.app.Fragment;
+		import android.content.Intent;
+		import android.graphics.Color;
+		import android.os.Bundle;
+		import android.util.Log;
+		import android.view.ContextMenu;
+		import android.view.ContextMenu.ContextMenuInfo;
+		import android.view.MenuInflater;
+		import android.view.MenuItem;
+		import android.view.View;
+		import android.view.ViewGroup;
+		import android.widget.AdapterView;
+		import android.widget.ListView;
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.reminders.controller.AllRemindersFilter;
+		import br.unb.cic.reminders.controller.Controller;
+		import br.unb.cic.reminders.controller.ReminderFilter;
+		import br.unb.cic.reminders.model.Reminder;
+		import br.unb.cic.reminders2.R;
+
+		public class ReminderListFragment extends Fragment implements
+		FiltersListChangeListener {
+
+			private static String TAG = "reminder fragment list";
+
+			private ReminderArrayAdapter adapter;
+
+			private ReminderArrayAdapter contextMenuAdapter;
+
+			private View view;
+
+			@Override
+			public View onCreateView(android.view.LayoutInflater inflater, ViewGroup
+				container, Bundle savedInstanceState) {
+				super.onCreate(savedInstanceState);
+				Log.i(TAG, "onCreate");
+				view = inflater.inflate(R.layout.reminders_list_fragment, container,
+					false);
+				createUI();
+				return view;
+			}
+
+			@Override
+			public void onResume() {
+				super.onResume();
+				updateListView(null);
+			}
+
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo
+				menuInfo) {
+				super.onCreateContextMenu(menu, v, menuInfo);
+
+				ListView view = ( ListView ) v;
+				contextMenuAdapter = ( ReminderArrayAdapter ) view.getAdapter();
+
+				menu.setHeaderTitle(R.string.context_menu_reminder_title);
+
+				MenuInflater inflater = getActivity().getMenuInflater();
+				inflater.inflate(R.menu.reminder_list_fragment_context_menu, menu);
+			}
+
+			@Override
+			public boolean onContextItemSelected(MenuItem item) {
+				if(item.getGroupId() == R.id.context_menu_reminder) {
+
+					AdapterView.AdapterContextMenuInfo info = (
+					AdapterView.AdapterContextMenuInfo ) item.getMenuInfo();
+					Reminder reminder = ( Reminder )
+					contextMenuAdapter.getItem(info.position);
+
+					switch(item.getItemId()) {
+						case R.id.edit : Intent editIntent = new
+						Intent(getActivity().getApplicationContext(),
+							EditReminderActivity.class);
+						setIntent(reminder, editIntent);
+						startActivity(editIntent);
+						updateListView(null);
+						return true;
+						case R.id.delete : try {
+							Controller.instance(getActivity().getApplicationContext()).deleteReminder(reminder);
+						}
+						catch(DBException e) {
+							Log.e(TAG, e.getMessage());
+						}
+						updateListView(null);
+						return true;
+						default : return super.onContextItemSelected(item);
+					}
+
+				}
+				return super.onContextItemSelected(item);
+			}
+
+			private void setIntent(Reminder reminder, Intent editIntent) {
+				editIntent.putExtra("id", reminder.getId());
+				editIntent.putExtra("text", reminder.getText());
+				editIntent.putExtra("details", reminder.getDetails());
+			}
+
+			public void onSelectedFilterChanged(ReminderFilter filter) {
+				updateListView(filter);
+			}
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.Iterator;
+
+		import android.content.Context;
+		import android.widget.ArrayAdapter;
+		import br.unb.cic.reminders2.R;
+
+		public class SpinnerAdapterGenerator<T> {
+
+			public ArrayAdapter<T> getSpinnerAdapter(Iterable<T> items, Context context)
+			{
+
+				ArrayAdapter<T> adapter = new
+				ArrayAdapter<T>(context.getApplicationContext(), R.layout.spinner_item);
+				adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+
+				if(items != null && items.iterator().hasNext()) {
+					Iterator<T> it = items.iterator();
+					while(it.hasNext()) {
+						adapter.add(it.next());
+					}
+				}
+
+				return adapter;
+			}
+
+		}
+	}
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.Calendar;
+
+		import android.app.Dialog;
+		import android.app.DialogFragment;
+		import android.app.TimePickerDialog;
+		import android.content.DialogInterface;
+		import android.os.Bundle;
+		import android.widget.ArrayAdapter;
+		import android.widget.Spinner;
+		import android.widget.TimePicker;
+
+		class TimePickerDialogFragment extends DialogFragment implements
+		TimePickerDialog.OnTimeSetListener {
+
+			private Calendar time;
+
+			private Spinner spinnerTime;
+
+			private int pHour;
+			private int pMinute;
+
+			public TimePickerDialogFragment(Calendar date, Spinner spinnerTime) {
+				this.time = date;
+				this.spinnerTime = spinnerTime;
+			}
+
+			@Override
+			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				int hour = time.get(Calendar.HOUR_OF_DAY);
+				int minute = time.get(Calendar.MINUTE);
+
+				return new TimePickerDialog(getActivity(), this, hour, minute, true);
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				time.set(Calendar.MINUTE, pMinute);
+				time.set(Calendar.HOUR_OF_DAY, pHour);
+				String sTime = Integer.toString(pMinute);
+				if(pMinute < 10) sTime = "0" + sTime;
+				sTime = Integer.toString(pHour) + ":" + sTime;
+
+				ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
+				spinnerTime.getAdapter();
+				adapter.add(sTime);
+				spinnerTime.setSelection(2);
+
+				super.onDismiss(dialog);
+			}
+
+			public void onTimeSet(TimePicker view, int hour, int minute) {
+				pHour = hour;
+				pMinute = minute;
+			}
+		}
+	}
+	//#endif
+}
+//#endif
