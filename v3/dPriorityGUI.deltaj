@@ -1,0 +1,380 @@
+//#ifdef priority
+delta dPriorityGUI {
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.ArrayList;
+		import java.util.List;
+
+		import android.app.Fragment;
+		import android.os.Bundle;
+		import android.util.Log;
+		import android.view.ContextMenu;
+		import android.view.ContextMenu.ContextMenuInfo;
+		import android.view.LayoutInflater;
+		import android.view.MenuInflater;
+		import android.view.View;
+		import android.view.ViewGroup;
+		import android.widget.AdapterView;
+		import android.widget.AdapterView.OnItemClickListener;
+		import android.widget.Button;
+		import android.widget.ListView;
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.reminders.controller.AllRemindersFilter;
+		import br.unb.cic.reminders.controller.Controller;
+		import br.unb.cic.reminders.controller.PriorityFilter;
+		import br.unb.cic.reminders.controller.ReminderFilter;
+		import br.unb.cic.reminders.model.Priority;
+		import br.unb.cic.reminders2.R;
+
+		public class FilterListFragment extends Fragment implements
+		OnItemClickListener {
+
+			private static final String CURRENT_FILTER_KEY = "current_filter";
+
+			private static String TAG = "filter fragment list";
+
+			private int currentFilterIndex;
+
+			private List<FiltersListChangeListener> listeners;
+
+			private FiltersListChangeListener filtersChangeListener;
+
+			private int currentFilterId;
+
+			private ReminderFilterArrayAdapter adapter;
+			private View view;
+
+			private Button btAddCategory;
+			private ListView lvFilters;
+
+			@Override
+			public void onActivityCreated(Bundle savedInstanceState) {
+				super.onActivityCreated(savedInstanceState);
+
+				if(savedInstanceState != null) {
+					currentFilterIndex = savedInstanceState.getInt(CURRENT_FILTER_KEY);
+				}
+
+				currentFilterId = 0;
+
+				adapter = null;
+			}
+
+			@Override
+			public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+				view = inflater.inflate(R.layout.categories_list_fragment, container,
+					false);
+				createUI();
+				return view;
+			}
+
+			@Override
+			public void onResume() {
+				super.onResume();
+				updateListView();
+			}
+
+			public void addListener(FiltersListChangeListener filter) {
+				if(listeners == null) listeners = new
+				ArrayList<FiltersListChangeListener>();
+				listeners.add(filter);
+			}
+
+			public void notifyListeners(ReminderFilter filter) {
+				for(FiltersListChangeListener c : listeners) {
+					c.onSelectedFilterChanged(filter);
+				}
+			}
+
+			private void createUI() {
+
+				lvFilters = ( ListView ) view.findViewById(R.id.listCategories);
+				lvFilters.setOnItemClickListener(this);
+				registerForContextMenu(lvFilters);
+				updateListView();
+			}
+
+			private void updateListView() {
+
+				List<ReminderFilter> filters = listOfFilters();
+
+				adapter = new
+				ReminderFilterArrayAdapter(getActivity().getApplicationContext(), filters);
+
+				lvFilters.setAdapter(adapter);
+			}
+
+			private List<ReminderFilter> listOfFilters() {
+				List<ReminderFilter> filters = new ArrayList<ReminderFilter>();
+
+				AllRemindersFilter allRemindersFilter = new
+				AllRemindersFilter(getActivity());
+				filters.add(allRemindersFilter);
+
+				PriorityFilter highPriorityFilter = new PriorityFilter(Priority.HIGH,
+					getActivity());
+				filters.add(highPriorityFilter);
+				PriorityFilter normalPriorityFilter = new PriorityFilter(Priority.NORMAL,
+					getActivity());
+				filters.add(normalPriorityFilter);
+				PriorityFilter lowPriorityFilter = new PriorityFilter(Priority.LOW,
+					getActivity());
+				filters.add(lowPriorityFilter);
+
+				return filters;
+			}
+
+			public void onItemClick(AdapterView<? extends Object> adapterView, View
+				view, int position, long id) {
+				notifyListeners(adapter.getItem(position));
+
+			}
+
+			public void onNothingSelected(AdapterView<? extends Object> arg0) {
+
+			}
+
+		}
+	}
+	
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderFilterArrayAdapter {
+
+		modifies ReminderFilterArrayAdapter(Context context, List<ReminderFilter>
+			objects) {
+			super(context, R.layout.category_row, objects);
+		}
+
+		modifies getView(int position, View convertView, ViewGroup parent) {
+			LinearLayout filterRow;
+
+			if(convertView == null) {
+				filterRow = new LinearLayout(getContext());
+				String inflater = Context.LAYOUT_INFLATER_SERVICE;
+				LayoutInflater vi;
+				vi = ( LayoutInflater ) getContext().getSystemService(inflater);
+				vi.inflate(R.layout.category_row, filterRow, true);
+			}
+			else {
+				filterRow = ( LinearLayout ) convertView;
+			}
+
+			TextView tvFilter = ( TextView )
+			filterRow.findViewById(R.id.row_categoryName);
+			tvFilter.setText(getItem(position).getName());
+
+			TextView tvNumReminders = ( TextView )
+			filterRow.findViewById(R.id.row_categoryCounter);
+			tvNumReminders.setText(Integer.toString(getItem(position).getNumReminders()));
+
+			return filterRow;
+		}
+	}
+	//#endif
+	
+	//#ifdef edit
+	modifies br.unb.cic.reminders.view.EditReminderActivity {
+
+		adds import br.unb.cic.reminders.model.Priority;
+
+		modifies setInitializeValues(Intent intent) {
+			original(intent);
+			String priority = intent.getStringExtra("priority");
+			spinnerPriority.setSelection(Priority.fromCode(Integer.parseInt(priority,
+						10)).getCode());
+		}
+	}
+	//#endif
+	
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ExternalAddReminderActivity {
+
+		adds import br.unb.cic.reminders.model.Priority;
+
+		modifies reminderFromIntent(Intent intent) {
+			original(intent);
+
+			String priority = intent.getStringExtra("priority");
+			reminder.setPriority(Priority.fromCode(Integer.parseInt(priority)));
+		}
+
+		modifies initialize() {
+			original();
+
+			spinnerPriority.setSelection(reminder.getPriority());
+		}
+	}
+	//#endif
+	
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
+		adds import android.widget.ImageView;
+		adds import android.graphics.Typeface;
+
+		modifies view(int position, LinearLayout reminderRow) {
+			original(position, reminderRow);
+
+			ImageView ivPriority = ( ImageView )
+			reminderRow.findViewById(R.id.ivPriority);
+
+			if(getItem(position).getPriority() == 1)
+			ivPriority.setImageResource(R.drawable.important);
+			else if(getItem(position).getPriority() == 2)
+			ivPriority.setImageResource(R.drawable.urgent);
+
+			if(getItem(position).getPriority() != 0) tvReminder.setTypeface(null,
+				Typeface.BOLD);
+
+		}
+	}
+
+	modifies br.unb.cic.reminders.view.ReminderListFragment {
+
+		modifies setIntent(Reminder reminder, Intent editIntent) {
+			original(reminder, editIntent);
+
+			editIntent.putExtra("priority", Integer.toString(reminder.getPriority()));
+		}
+	}
+
+	modifies br.unb.cic.reminders.view.ReminderActivity {
+
+		adds import br.unb.cic.reminders.model.Priority;
+		adds import java.util.Arrays;
+		adds private Priority selectedPriority;
+		adds protected Spinner spinnerPriority;
+
+		modifies initializeFields() {
+			original();
+			spinnerPriority = getSpinnerPriority();
+		}
+
+		modifies initializeListeners() {
+			original();
+			addListenerToSpinnerPriority();
+		}
+
+		modifies setValuesOnReminder() {
+			original();
+			reminder.setPriority(selectedPriority);
+		}
+
+		adds private Spinner getSpinnerPriority() {
+			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerPriorities);
+
+			SpinnerAdapterGenerator<Priority> adapterPriorityGenerator = new
+			SpinnerAdapterGenerator<Priority>();
+
+			List<Priority> priorityValues = Arrays.asList(Priority.values());
+
+			ArrayAdapter<Priority> priorityArrayAdapter =
+			adapterPriorityGenerator.getSpinnerAdapter(priorityValues, this);
+
+			spinner.setAdapter(priorityArrayAdapter);
+
+			spinner.setSelection(Priority.NORMAL.getCode());
+
+			return spinner;
+		}
+
+		adds private void addListenerToSpinnerPriority() {
+			spinnerPriority.setOnItemSelectedListener(new OnItemSelectedListener() {
+					public void onItemSelected(AdapterView<? extends Object> parent, View
+						view, int pos, long id) {
+						selectedPriority = ( Priority ) parent.getItemAtPosition(pos);
+					}
+
+					public void onNothingSelected(AdapterView<? extends Object> parent) {
+
+					}
+				});
+		}
+	}
+	//#endif
+	
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ReminderAddActivity {
+		adds import br.unb.cic.reminders.model.Priority;
+		adds import android.widget.Spinner;
+		adds import java.util.Arrays;
+		adds import android.widget.ArrayAdapter;
+		adds import java.util.List;
+		adds import android.widget.AdapterView;
+		adds import android.widget.AdapterView.OnItemSelectedListener;
+
+		adds private Priority selectedPriority;
+		adds private Spinner spinnerPriority;
+
+		modifies configureActionListener() {
+			original();
+
+			addListenerToSpinnerPriority();
+		}
+
+		modifies setCreateReminder(Reminder reminder) {
+			original(reminder);
+
+			reminder.setPriority(selectedPriority);
+		}
+
+		modifies existingReminderValues(Reminder reminder, Intent intent) {
+			original(reminder, intent);
+
+			String priority = intent.getStringExtra("priority");
+			reminder.setPriority(Priority.fromCode(Integer.parseInt(priority, 10)));
+		}
+
+		modifies createReminderIntent(Intent intent, Reminder reminder) {
+			original(intent, reminder);
+
+			String priority = intent.getStringExtra("priority");
+		}
+		
+		modifies initialize(Reminder reminder) {
+			original(reminder);
+			
+			spinnerPriority = getSpinnerPriority();
+		}
+
+		modifies updateFieldsFromReminder(Reminder reminder) {
+			original(reminder);
+
+			spinnerPriority.setSelection(reminder.getPriority());
+		}
+
+		adds private Spinner getSpinnerPriority() {
+			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerPriorities);
+
+			SpinnerAdapterGenerator<Priority> adapterPriorityGenerator = new
+			SpinnerAdapterGenerator<Priority>();
+
+			List<Priority> priorityValues = Arrays.asList(Priority.values());
+
+			ArrayAdapter<Priority> priorityArrayAdapter =
+			adapterPriorityGenerator.getSpinnerAdapter(priorityValues, this);
+
+			spinner.setAdapter(priorityArrayAdapter);
+
+			spinner.setSelection(Priority.NORMAL.getCode());
+
+			return spinner;
+		}
+
+		adds private void addListenerToSpinnerPriority() {
+			spinnerPriority.setOnItemSelectedListener(new OnItemSelectedListener() {
+					public void onItemSelected(AdapterView<? extends Object> parent, View
+						view, int pos, long id) {
+						selectedPriority = ( Priority ) parent.getItemAtPosition(pos);
+					}
+
+					public void onNothingSelected(AdapterView<? extends Object> parent) {
+
+					}
+				});
+		}
+	}
+	//#endif
+}
+//#endif

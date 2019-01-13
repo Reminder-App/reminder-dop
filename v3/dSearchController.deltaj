@@ -1,0 +1,22 @@
+//#ifdef search
+delta dSearchController {
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.controller.ReminderFilter {
+		adds public List<Reminder> getReminders(String search) {
+			updateReminders();
+			if(search == null || search.trim().equals("")) {
+				updateReminders();
+				return reminders;
+			}
+			List<Reminder> values = new ArrayList<Reminder>();
+			for(Reminder item : this.reminders) {
+				if(item.getText().contains(search)) {
+					values.add(item);
+				}
+			}
+			return values;
+		}
+	}
+	//#endif
+}
+//#endif

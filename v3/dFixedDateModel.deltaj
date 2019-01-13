@@ -1,0 +1,90 @@
+//#ifdef fixedDate
+delta dFixedDateModel {
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.model.Reminder {
+		adds import br.unb.cic.reminders.view.InvalidHourException;
+
+		adds @Column(column = "DATE", type = DBTypes.TEXT)
+		private String date;
+
+		adds @Column(column = "HOUR", type = DBTypes.TEXT)
+		private String hour;
+
+		adds public String getDate() {
+			return date;
+		}
+
+		adds public void setDate(String date) {
+			if(!(date == null || date.equals("")) && ! checkFormat(date,
+					Patterns.DATE_PATTERN)) {
+				throw new InvalidDateException(date);
+			}
+			this.date = date;
+		}
+
+		adds public String getHour() {
+			return hour;
+		}
+
+		adds public void setHour(String hour) {
+			if(!(hour == null || hour.equals("")) && ! checkFormat(hour,
+					Patterns.HOUR_PATTERN)) {
+				throw new InvalidHourException(hour);
+			}
+			this.hour = hour;
+		}
+
+		adds private boolean checkFormat(String date, String pattern) {
+			Pattern p = Pattern.compile(pattern);
+			Matcher m = p.matcher(date);
+			return m.matches();
+		}
+
+		modifies isValid() {
+			return original() &&(date != null && hour != null);
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.db.DBConstants {
+		adds public static String REMINDER_DATE_COLUMN = "DATE";
+		adds public static String REMINDER_HOUR_COLUMN = "HOUR";
+
+		modifies tableStatement() {
+			return original() + " DATE CHAR(10) NULL," + "HOUR CHAR(5) NULL,";
+		}
+	}
+
+	modifies br.unb.cic.reminders.model.cp.ReminderContentProvider {
+		adds public static final String date() {
+			return DBConstants.REMINDER_DATE_COLUMN;
+		}
+
+		adds public static final String hour() {
+			return DBConstants.REMINDER_HOUR_COLUMN;
+		}
+
+		modifies createReminderInsert(ContentValues values) throws DBException {
+			Reminder reminder = original(values);
+			reminder.setDate(values.getAsString(date()));
+			reminder.setHour(values.getAsString(hour()));
+			return reminder;
+		}
+
+	}
+
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		modifies valuesCursorToReminder(Cursor cursor, Reminder reminder) {
+			original(cursor, reminder);
+
+			String date =
+			cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_DATE_COLUMN));
+			reminder.setDate(date);
+
+			String hour =
+			cursor.getString(cursor.getColumnIndex(DBConstants.REMINDER_HOUR_COLUMN));
+			reminder.setHour(hour);
+		}
+	}
+	//#endif
+}
+//#endif

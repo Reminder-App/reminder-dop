@@ -1,0 +1,16 @@
+//#ifdef edit
+delta dEditController {
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.controller.Controller {
+		adds public void updateReminder(Reminder reminder) throws DBException {
+			try {
+				DBFactory.factory(context).createReminderDAO().updateReminder(reminder);
+			}
+			catch(DBException e) {
+				throw e;
+			}
+		}
+	}
+	//#endif
+}
+//#endif

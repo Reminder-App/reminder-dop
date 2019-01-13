@@ -1,0 +1,81 @@
+//#ifdef reminder
+delta dController {
+	//#ifdef manageReminder
+	adds {
+		package br.unb.cic.reminders.controller;
+
+		import java.util.List;
+
+		import android.content.Context;
+		import br.unb.cic.framework.persistence.DBException;
+		import br.unb.cic.reminders.model.Reminder;
+		import br.unb.cic.reminders.model.db.DBFactory;
+
+		public class Controller {
+			private Context context;
+
+			private static Controller instance;
+
+			private Controller(Context c) {
+				this.context = c;
+			}
+
+			public static final Controller instance(Context c) {
+				if(instance == null) {
+					instance = new Controller(c);
+				}
+
+				return instance;
+			}
+			
+			public void persistReminder(Reminder reminder) throws DBException {
+				try {
+					DBFactory.factory(context).createReminderDAO().persistReminder(reminder);
+				}
+				catch(DBException e) {
+					throw e;
+				}
+			}
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.controller;
+
+		import java.util.ArrayList;
+		import java.util.List;
+
+		import android.content.Context;
+		import br.unb.cic.reminders.model.Reminder;
+
+		public abstract class ReminderFilter {
+
+			private Context context;
+
+			public ReminderFilter(Context context) {
+				this.context = context;
+			}
+
+			abstract public String getName();
+		}
+	}
+	
+	adds {
+		package br.unb.cic.reminders.controller;
+
+		import android.content.Context;
+		import br.unb.cic.reminders.model.Reminder;
+
+		public class AllRemindersFilter extends ReminderFilter {
+
+			private final String name = "All";
+
+			@Override
+			public String getName() {
+				return name;
+			}
+		}
+	}
+	//#endif
+}
+//#endif

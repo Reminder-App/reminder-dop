@@ -1,0 +1,77 @@
+//#ifdef manageCategory
+delta dManageCategoryModel {
+	//#ifdef staticCategory
+	modifies br.unb.cic.reminders.model.db.CategoryDAO {
+		adds public void saveCategory(Category category) throws DBException;
+		adds public void updateCategory(Category category) throws DBException;
+		adds public void deleteCategory(Category category) throws DBException;
+	}
+	//#endif
+
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.model.cp.ReminderContentProvider {
+		modifies createCategoryInsert(ContentValues values) {
+			Category category = original(values);
+			if(category == null) {
+				Category auxCategory = new Category();
+				auxCategory.setName(values.getAsString(category()));
+				cdao.saveCategory(auxCategory);
+				category = cdao.findCategory(values.getAsString(category()));
+			}
+			return category;
+		}
+	}
+	//#endif
+
+	//#ifdef staticCategory
+	modifies br.unb.cic.reminders.model.db.DefaultCategoryDAO {
+		adds import br.unb.cic.framework.persistence.DBInvalidEntityException;
+		adds public void saveCategory(Category category) throws DBException {
+			try {
+				persist(category);
+			}
+			catch(DBInvalidEntityException e) {
+				throw new DBException();
+			}
+		}
+		
+		adds public void updateCategory(Category category) throws DBException {
+			try {
+				try {
+					persist(category);
+				}
+				catch(DBInvalidEntityException e) {
+					throw new DBException();
+				}
+			}
+			catch(SQLiteException e) {
+				Log.e(DefaultCategoryDAO.class.getCanonicalName(),
+					e.getLocalizedMessage());
+				throw new DBException();
+			}
+			finally {
+				db.close();
+				dbHelper.close();
+			}
+		}
+		
+		adds public void deleteCategory(Category category) throws DBException {
+			try {
+				db = dbHelper.getWritableDatabase();
+				db.delete(DBConstants.CATEGORY_TABLE, DBConstants.CATEGORY_PK_COLUMN + "="
+					+ category.getId(), null);
+			}
+			catch(SQLiteException e) {
+				Log.e(DefaultCategoryDAO.class.getCanonicalName(),
+					e.getLocalizedMessage());
+				throw new DBException();
+			}
+			finally {
+				db.close();
+				dbHelper.close();
+			}
+		}
+	}
+	//#endif
+}
+//#endif

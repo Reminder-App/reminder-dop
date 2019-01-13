@@ -1,0 +1,26 @@
+//#ifdef delete
+delta dDeleteModel {
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.model.db.ReminderDAO {
+		adds public void deleteReminder(Reminder reminder) throws DBException;
+	}
+
+	modifies br.unb.cic.reminders.model.db.DefaultReminderDAO {
+		adds public void deleteReminder(Reminder reminder) throws DBException {
+			try {
+				db = dbHelper.getWritableDatabase();
+				db.delete(DBConstants.REMINDER_TABLE, DBConstants.REMINDER_PK_COLUMN + "="
+					+ reminder.getId(), null);
+			}
+			catch(SQLiteException e) {
+				throw new DBException();
+			}
+			finally {
+				db.close();
+				dbHelper.close();
+			}
+		}
+	}
+	//#endif
+}
+//#endif

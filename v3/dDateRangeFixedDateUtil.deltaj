@@ -1,0 +1,30 @@
+//#if dateRange || fixedDate
+delta dDateRangeFixedDateUtil {
+	adds {
+		package util;
+
+		import java.text.ParseException;
+		import java.text.SimpleDateFormat;
+		import java.util.Date;
+		import java.util.Locale;
+
+		public class DateFormat {
+
+			public static Date dateFormater(String dateUnformated) throws ParseException
+			{
+				SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm",
+					Locale.getDefault());
+				return sdf.parse(dateUnformated);
+			}
+		}
+	}
+	//#ifdef manageReminder
+	modifies util.Patterns{
+		adds public static final String DATE_PATTERN =
+			"(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\\d\\d";
+
+		adds public static final String HOUR_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+	}
+	//#endif
+}
+//#endif
