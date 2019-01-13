@@ -1,0 +1,19 @@
+//#ifdef staticCategory
+delta dStaticCategoryReminder {
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.ReminderMainActivity {
+		adds import br.unb.cic.reminders.view.FilterListFragment;
+		
+		modifies createUI() {
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ReminderListFragment listReminderFragment = new ReminderListFragment();
+			FilterListFragment listCategoryFragment = new FilterListFragment();
+			listCategoryFragment.addListener(listReminderFragment);
+			ft.add(R.id.listReminders, listReminderFragment);
+			ft.add(R.id.listCategories, listCategoryFragment);
+			ft.commit();
+		}
+	}
+	//#endif
+}
+//#endif

@@ -1,0 +1,16 @@
+//#ifdef delete
+delta dDeleteController {
+	//#ifdef manageReminder
+	modifies br.unb.cic.reminders.controller.Controller {
+		adds public void deleteReminder(Reminder reminder) throws DBException {
+			try {
+				DBFactory.factory(context).createReminderDAO().deleteReminder(reminder);
+			}
+			catch(DBException e) {
+				throw e;
+			}
+		}
+	}
+	//#endif
+}
+//#endif
