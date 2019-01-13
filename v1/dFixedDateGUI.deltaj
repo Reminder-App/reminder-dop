@@ -1,0 +1,482 @@
+//#if fixedDate
+delta dFixedDateGUI {
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ExternalAddReminderActivity {
+		modifies initialize() {
+			original();
+			
+			updateSpinnerDateHour(spinnerDate, reminder.getDate());
+			updateDateFromString(reminder.getDate());
+			updateSpinnerDateHour(spinnerTime, reminder.getHour());
+			updateTimeFromString(reminder.getHour());
+		}
+		
+		modifies reminderFromIntent(Intent intent) {
+			original(intent);
+			
+			String date = intent.getStringExtra("date");
+			String hour = intent.getStringExtra("hour");
+			reminder.setDate(date);
+			reminder.setHour(hour);
+		}
+	}
+	//#endif
+
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderListFragment{
+		adds import java.util.Calendar;
+		adds import java.util.GregorianCalendar;
+		adds private ListView lvReminderNoDate;
+		
+		modifies setIntent(Reminder reminder, Intent editIntent){
+			original(reminder, editIntent);
+			
+			editIntent.putExtra("date", reminder.getDate());
+			editIntent.putExtra("hour", reminder.getHour());
+		}
+		
+		modifies valuesForRegister(){
+			original();
+			
+			registerForContextMenu(lvReminderNoDate);
+		}
+		
+		modifies createListView(){
+			original();
+			
+			lvReminderNoDate = (ListView) view.findViewById(R.id.lvRemindersNoDate);
+		}
+	}
+
+	modifies br.unb.cic.reminders.view.ReminderActivity {
+		adds protected Calendar date, time;
+		adds protected Spinner spinnerDate, spinnerTime;
+		adds protected EditText edtDate, edtTime;
+
+		modifies initializeFields() {
+			original();
+			
+			spinnerDate = getSpinnerDate();
+			spinnerTime = getSpinnerTime();
+		}
+
+		modifies initializeListeners() {
+			original();
+			
+			addListenerToSpinnerDate();
+			addListenerToSpinnerTime();
+		}
+		
+		modifies setValuesOnReminder() {
+			original();
+			
+			reminder.setDate(dateToString());
+			reminder.setHour(timeToString());
+		}
+
+		adds private String dateToString() {
+			if(date == null) return null;
+			String sDate;
+			sDate = Integer.toString(date.get(Calendar.MONTH) + 1);
+			if(date.get(Calendar.MONTH) + 1 < 10) sDate = "0" + sDate;
+			sDate = Integer.toString(date.get(Calendar.DAY_OF_MONTH)) + "-" + sDate;
+			if(date.get(Calendar.DAY_OF_MONTH) < 10) sDate = "0" + sDate;
+			sDate += "-" + Integer.toString(date.get(Calendar.YEAR));
+			return sDate;
+		}
+
+		adds private String timeToString() {
+			if(time == null) return null;
+			String sTime;
+			sTime = Integer.toString(time.get(Calendar.MINUTE));
+			if(time.get(Calendar.MINUTE) < 10) sTime = "0" + sTime;
+			sTime = Integer.toString(time.get(Calendar.HOUR_OF_DAY)) + ":" + sTime;
+			if(time.get(Calendar.HOUR_OF_DAY) < 10) sTime = "0" + sTime;
+			return sTime;
+		}
+
+		adds protected void updateDateFromString(String sDate) {
+			if(sDate == null || sDate.equals("")) {
+				date = null;
+				return;
+			}
+			char sDay [] = {
+				sDate.charAt(0), sDate.charAt(1)
+			};
+			int day = Integer.parseInt(new String(sDay), 10);
+			char sMonth [] = {
+				sDate.charAt(3), sDate.charAt(4)
+			};
+			int month = Integer.parseInt(new String(sMonth), 10);
+			char sYear [] = {
+				sDate.charAt(6), sDate.charAt(7), sDate.charAt(8), sDate.charAt(9)
+			};
+			int year = Integer.parseInt(new String(sYear), 10);
+			if(date == null) date = Calendar.getInstance();
+			date.set(year, month - 1, day);
+		}
+
+		adds protected void updateTimeFromString(String sTime) {
+			if(sTime == null || sTime.equals("")) {
+				time = null;
+				return;
+			}
+			char sHour [] = {
+				sTime.charAt(0), sTime.charAt(1)
+			};
+			int hour = Integer.parseInt(new String(sHour), 10);
+			char sMinute [] = {
+				sTime.charAt(3), sTime.charAt(4)
+			};
+			int minute = Integer.parseInt(new String(sMinute), 10);
+			if(time == null) time = Calendar.getInstance();
+			time.set(Calendar.MINUTE, minute);
+			time.set(Calendar.HOUR_OF_DAY, hour);
+		}
+
+		adds @SuppressWarnings("unchecked")
+		protected void updateSpinnerDateHour(Spinner spinner, String dateOrHour) {
+			if(dateOrHour == null) return;
+
+			ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
+			spinner.getAdapter();
+
+			int count = adapter.getCount();
+			if(count > 2) {
+				for(int i = 2;
+					i < count;
+					++ i) adapter.remove(adapter.getItem(i));
+			}
+			adapter.add(dateOrHour);
+			spinner.setSelection(2);
+		}
+
+		adds private Spinner getSpinnerDate() {
+			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerDate);
+
+			SpinnerAdapterGenerator<String> adapterDateGenerator = new
+			SpinnerAdapterGenerator<String>();
+
+			List<String> items = new ArrayList<String>();
+			items.add("No date");
+			items.add("+ Select");
+
+			spinner.setAdapter(adapterDateGenerator.getSpinnerAdapter(items, this));
+
+			return spinner;
+		}
+
+		adds private Spinner getSpinnerTime() {
+			Spinner spinner = ( Spinner ) findViewById(R.id.spinnerTime);
+
+			SpinnerAdapterGenerator<String> adapterTimeGenerator = new
+			SpinnerAdapterGenerator<String>();
+
+			List<String> items = new ArrayList<String>();
+			items.add("No time");
+			items.add("+ Select");
+
+			spinner.setAdapter(adapterTimeGenerator.getSpinnerAdapter(items, this));
+
+			return spinner;
+		}
+		
+		adds private void addListenerToSpinnerDate() {
+			spinnerDate.setOnTouchListener(new View.OnTouchListener() {
+					public boolean onTouch(View v, MotionEvent event) {
+						spinnerDate = getSpinnerDate();
+						return false;
+					}
+				});
+
+			spinnerDate.setOnKeyListener(new View.OnKeyListener() {
+					public boolean onKey(View v, int keyCode, KeyEvent event) {
+						spinnerDate = getSpinnerDate();
+						return false;
+					}
+				});
+
+			spinnerDate.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+					public void onItemSelected(AdapterView<? extends Object> parent, View
+						view, int pos, long id) {
+
+						switch(pos) {
+							case 0 : date = null;
+							break;
+							case 1 : if(date == null) date = Calendar.getInstance();
+							DialogFragment newFragment = new DatePickerDialogFragment(date,
+								spinnerDate);
+							newFragment.show(getFragmentManager(), "datePicker");
+							break;
+							default :
+						}
+					}
+
+					public void onNothingSelected(AdapterView<? extends Object> arg0) {
+
+					}
+
+				});
+		}
+		
+		adds private void addListenerToSpinnerTime() {
+			spinnerTime.setOnTouchListener(new View.OnTouchListener() {
+					public boolean onTouch(View v, MotionEvent event) {
+						spinnerTime = getSpinnerTime();
+						return false;
+					}
+				});
+
+			spinnerTime.setOnKeyListener(new View.OnKeyListener() {
+					public boolean onKey(View v, int keyCode, KeyEvent event) {
+						spinnerTime = getSpinnerTime();
+						return false;
+					}
+				});
+
+			spinnerTime.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+					public void onItemSelected(AdapterView<? extends Object> parent, View
+						view, int pos, long id) {
+
+						switch(pos) {
+							case 0 : time = null;
+							break;
+							case 1 : if(time == null) time = Calendar.getInstance();
+							DialogFragment newFragment = new TimePickerDialogFragment(time,
+								spinnerTime);
+							newFragment.show(getFragmentManager(), "timePicker");
+							break;
+							default :
+						}
+					}
+
+					public void onNothingSelected(AdapterView<? extends Object> arg0) {
+
+					}
+
+				});
+
+		}
+	}
+	//#endif
+
+	adds {
+		package br.unb.cic.reminders.view;
+
+		import java.util.Calendar;
+
+		import android.app.DatePickerDialog;
+		import android.app.Dialog;
+		import android.app.DialogFragment;
+		import android.content.DialogInterface;
+		import android.os.Bundle;
+		import android.widget.ArrayAdapter;
+		import android.widget.DatePicker;
+		import android.widget.Spinner;
+
+		class DatePickerDialogFragment extends DialogFragment implements
+		DatePickerDialog.OnDateSetListener {
+
+			private Calendar date;
+			private Spinner spinnerDate;
+
+			private int pYear;
+			private int pDay;
+			private int pMonth;
+
+			public DatePickerDialogFragment(Calendar date, Spinner spinnerDate) {
+				this.date = date;
+				this.spinnerDate = spinnerDate;
+			}
+
+			@Override
+			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				int year = date.get(Calendar.YEAR);
+				int month = date.get(Calendar.MONTH);
+				int day = date.get(Calendar.DAY_OF_MONTH);
+
+				return new DatePickerDialog(getActivity(), this, year, month, day);
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				date.set(pYear, pMonth, pDay);
+				String sDate = Integer.toString(pDay) + "-" + Integer.toString(pMonth + 1)
+				+ "-" + Integer.toString(pYear);
+
+				ArrayAdapter<String> adapter = ( ArrayAdapter<String> )
+				spinnerDate.getAdapter();
+
+				adapter.add(sDate);
+				spinnerDate.setSelection(2);
+
+				super.onDismiss(dialog);
+			}
+
+			public void onDateSet(DatePicker view, int year, int month, int day) {
+				pYear = year;
+				pDay = day;
+				pMonth = month;
+			}
+
+		}
+	}
+	
+	//#ifdef gui
+	modifies br.unb.cic.reminders.view.ReminderArrayAdapter {
+		adds public static final int NO_DATE = 3;
+		
+		modifies view(int position, LinearLayout reminderRow){
+			original(position, reminderRow);
+			
+			TextView tvDateFirst = (TextView)reminderRow.findViewById(R.id.txtDateFirst);
+			TextView tvDateSecond = (TextView)reminderRow.findViewById(R.id.txtDateSecond);
+			tvDateFirst.setTextColor(rowColor);
+			tvDateFirst.setText(getDateFirst(position));
+			tvDateSecond.setTextColor(rowColor);
+			tvDateSecond.setText(getDateSecond(position));
+		}
+		
+		adds private String getDateFirst(int position) {
+			if(getItem(position).getDate() == null) {
+				return "";
+			}
+
+			String months [] = {
+				"JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT",
+				"NOV", "DEZ"
+			};
+			String week [] = {
+				"", "DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"
+			};
+
+			Calendar today = Calendar.getInstance();
+			GregorianCalendar thatDay = new GregorianCalendar();
+			thatDay.set(Integer.parseInt(getItem(position).getDate().substring(6, 10)),
+				Integer.parseInt(getItem(position).getDate().substring(3, 5)) - 1,
+				Integer.parseInt(getItem(position).getDate().substring(0, 2)));
+
+			switch(rowType) {
+				case LATE : long diff = today.getTimeInMillis() -
+				thatDay.getTimeInMillis();
+				long days = diff /(24*60*60*1000);
+				if(days == 1) return "Ontem";
+				else return "Há " + days + " dias";
+
+				case TODAY : return getDatesHour(position);
+
+				case NEXT_DAYS : diff = thatDay.getTimeInMillis() -
+				today.getTimeInMillis();
+				days = diff /(24*60*60*1000);
+
+				if(days == 1) {
+					return getDatesHour(position);
+				}
+				else if(days < 6) {
+					return week[thatDay.get(Calendar.DAY_OF_WEEK)];
+				}
+				else {
+					return thatDay.get(Calendar.DAY_OF_MONTH) + " " +
+					months[thatDay.get(Calendar.MONTH)];
+				}
+
+				default : break;
+			}
+
+			return getItem(position).getDate();
+
+		}
+
+		adds private String getDateSecond(int position) {
+			switch(rowType) {
+				case LATE : return getDatesHour(position);
+				case TODAY : return "hoje";
+				case NEXT_DAYS : Calendar today = Calendar.getInstance();
+				GregorianCalendar thatDay = new GregorianCalendar();
+				thatDay.set(Integer.parseInt(getItem(position).getDate().substring(6, 10)),
+					Integer.parseInt(getItem(position).getDate().substring(3, 5)) - 1,
+					Integer.parseInt(getItem(position).getDate().substring(0, 2)));
+
+				long diff = thatDay.getTimeInMillis() - today.getTimeInMillis();
+				long days = diff /(24*60*60*1000);
+
+				if(days == 1) return "amanha";
+				else return getDatesHour(position);
+				default : break;
+			}
+
+			return getItem(position).getHour();
+		}
+
+		adds private String getDatesHour(int position) {
+			if(getItem(position).getHour() == null) {
+				return "";
+			}
+
+			if(getItem(position).getHour().substring(3, 5) != "00") return
+			getItem(position).getHour().substring(0, 2) + "h" +
+			getItem(position).getHour().substring(3, 5);
+			else return getItem(position).getHour().substring(0, 2) + "h";
+		}
+	}
+	//#endif
+
+	//#ifdef create
+	modifies br.unb.cic.reminders.view.ReminderAddActivity {
+		adds private EditText edtDate, edtHour;
+
+		modifies setCreateReminder(Reminder reminder) {
+			original(reminder);
+			
+			reminder.setDate(edtDate.getText().toString());
+			reminder.setHour(edtHour.getText().toString());
+		}
+
+		modifies existingReminderValues(Reminder reminder, Intent intent) {
+			original(reminder, intent);
+			
+			String date = intent.getStringExtra("date");
+			reminder.setDate(date);
+
+			String hour = intent.getStringExtra("hour");
+			reminder.setHour(hour);
+		}
+		
+		modifies createReminderIntent(Intent intent, Reminder reminder) {
+			original(intent, reminder);
+			
+			String date = intent.getStringExtra("date");
+			String hour = intent.getStringExtra("hour");
+			
+			reminder.setDate(date);
+			reminder.setHour(hour);
+		}
+		
+		modifies updateFieldsFromReminder(Reminder reminder){
+			original(reminder);
+			
+			edtDate.setText(reminder.getDate());
+			edtHour.setText(reminder.getHour());
+		}
+	}
+	//#endif
+	//#ifdef edit
+	modifies br.unb.cic.reminders.view.EditReminderActivity{
+		modifies setInitializeValues(Intent intent){
+			original(intent);
+			
+			String date = intent.getStringExtra("date");
+			String hour = intent.getStringExtra("hour");
+	
+			updateSpinnerDateHour(spinnerDate, date);
+			updateDateFromString(date);
+			updateSpinnerDateHour(spinnerTime, hour);
+			updateTimeFromString(hour);
+		}
+	}
+	//#endif
+}
+//#endif
